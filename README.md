@@ -1,4 +1,6 @@
-MIT License
+# Workflow Designer for Simple Image Processing
+
+## MIT License
 
 Copyright (c) 2018 Nattakit Boonyang
 
