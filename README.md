@@ -1,5 +1,20 @@
 # Workflow Designer for Simple Image Processing
 
+## Supported browsers
+
+- Firefox 2+
+- Safari 3+
+- Opera 9.64+
+- Chrome (all versions)
+- IE10, IE11, Edge
+
+## Contributions
+
+- [Mr. Nattakit Boonyang](https://www.linkedin.com/in/nattakit-boonyang-3188b5157)
+- [Mr. Kullawat Chaowanawatee](https://www.linkedin.com/in/kullawat-chaowanawatee-3625687b)
+
+Computer Engineering, Prince of Songkla University, Phuket Campus
+
 ## MIT License
 
 Copyright (c) 2018 Nattakit Boonyang
