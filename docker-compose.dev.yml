@@ -5,6 +5,6 @@ services:
     ports:
      - "8888:8888"
     volumes:
-     - "C:/Users/vMS/Desktop/workflow-designer-project:/usr/src/app"
+     - .:/usr/src/app
     stdin_open: true
     tty: true
