@@ -1,10 +1,10 @@
 version: '3'
 services:
   web:
-    build: .
+    image: "anonyfz/workflow-designer-project:develop"
     ports:
      - "8888:8888"
     volumes:
-     - .:/usr/src/app
-  workflow-web:
-    image: "anonyfz/workflow-designer-project:develop"
+     - "C:/Users/vMS/Desktop/workflow-designer-project:/usr/src/app"
+    stdin_open: true
+    tty: true
