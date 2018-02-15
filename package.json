@@ -6,15 +6,17 @@
   "scripts": {},
   "devDependencies": {
     "debug": "3.1.0",
-    "eslint": "4.16.0"
+    "eslint": "4.17.0",
+    "nodemon": "1.14.12"
   },
   "dependencies": {
     "express": "4.16.2",
     "pug": "2.0.0-rc.4",
     "topological-sort": "0.1.5",
-    "fabric": "1.7.22",
+    "fabric": "2.0.1",
     "jquery": "3.3.1",
-    "jquery-ui": "1.12.1"
+    "jquery-ui": "1.12.1",
+    "opencv": "6.0.0"
   },
   "repository": {
     "type": "git",
