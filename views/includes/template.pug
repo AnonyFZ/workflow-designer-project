@@ -3,6 +3,8 @@ html(lang="en")
   head
     include ./meta.pug
     title HOME
+    block custom-header
   body
     block content
     include ./external.pug
+    block custom-external
