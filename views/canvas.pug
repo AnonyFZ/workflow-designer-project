@@ -1,0 +1,48 @@
+extends includes/template.pug
+
+block content
+  #modal.modal.fade(tabindex=-1, role="dialog")
+    .modal-dialog(role="document")
+      .modal-content
+        .modal-header
+          h5.modal-title Node Settings
+          button(type="button", class="close", data-dismiss="modal", aria-label="Close")
+            i.fas.fa-times.fa-xs
+        .modal-body
+        .modal-footer
+          button.btn.btn-primary Save Change
+          button.btn.btn-secondary(data-dismiss="modal") Close
+  .container-fluid.h-100
+    .row.justify-content-center.h-100
+      //- .col-sm-2
+        //- canvas#controller-canvas
+      #drawing-canvas-wrapping.col
+        canvas#drawing-canvas.canvas
+
+block custom-external
+  style.
+    html, body {
+      height: 100%
+    }
+    canvas {
+      border: 1px solid #000
+    }
+    .data-title:before {
+        content: attr(data-menutitle);
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        background: #DDD;
+        padding: 2px;
+
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-size: 11px;
+        font-weight: bold;
+    }
+    .data-title :first-child {
+        margin-top: 20px;
+    }
+    
+  script(src="/js/canvas.js")
