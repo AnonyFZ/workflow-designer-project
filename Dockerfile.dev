@@ -1,7 +1,0 @@
-FROM siomiz/node-opencv:2.4.x
-ENV NODE_ENV development
-WORKDIR /usr/src/app
-COPY package.json .
-EXPOSE 8888
-RUN npm install
-CMD DEBUG=* npm run start-with-babel-env server.js
