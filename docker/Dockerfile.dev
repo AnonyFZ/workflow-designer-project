@@ -1,0 +1,7 @@
+FROM siomiz/node-opencv:2.4.x
+ENV NODE_ENV development
+WORKDIR /usr/src/app
+EXPOSE 8888
+CMD echo "waiting npm install..." && \
+    npm install && \
+    DEBUG=* npm run start-with-babel-env server.js
