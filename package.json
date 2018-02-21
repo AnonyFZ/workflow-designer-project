@@ -4,15 +4,20 @@
   "description": "The software for simple workflow design to process images.",
   "main": "index.js",
   "scripts": {
-    "start-with-babel-env": "./node_modules/.bin/nodemon --exec ./node_modules/.bin/babel-node --presets=env"
+    "start-with-babel-env": "DEBUG=express:*,webpack ./node_modules/.bin/nodemon --exec ./node_modules/.bin/babel-node --presets=env"
   },
   "devDependencies": {
+    "babel-cli": "6.26.0",
+    "babel-core": "6.26.0",
+    "babel-loader": "7.1.2",
+    "babel-preset-env": "1.6.1",
     "debug": "3.1.0",
     "eslint": "4.17.0",
     "nodemon": "1.14.12",
-    "babel-cli": "6.26.0",
-    "babel-preset-env": "1.6.1",
-    "babel-watch": "2.0.7"
+    "popper.js": "^1.12.9",
+    "uglifyjs-webpack-plugin": "1.2.0",
+    "webpack": "3.11.0",
+    "webpack-dev-middleware": "2.0.5"
   },
   "dependencies": {
     "body-parser": "1.18.2",
@@ -24,7 +29,13 @@
     "opencv": "6.0.0",
     "pug": "2.0.0-rc.4",
     "serve-favicon": "2.4.5",
-    "topological-sort": "0.1.5"
+    "topological-sort": "0.1.5",
+    "fabric": "2.0.2",
+    "jquery": "3.3.1",
+    "jquery-ui": "1.12.1",
+    "jquery-contextmenu": "2.6.3",
+    "bootstrap": "4.0.0",
+    "lodash": "4.17.5"
   },
   "repository": {
     "type": "git",
