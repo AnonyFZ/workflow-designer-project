@@ -39,7 +39,8 @@
     "pug": "2.0.0-rc.4",
     "serve-favicon": "2.4.5",
     "topological-sort": "0.1.5",
-    "font-awesome": "4.7.0"
+    "font-awesome": "4.7.0",
+    "string-hash": "1.1.3"
   },
   "repository": {
     "type": "git",
