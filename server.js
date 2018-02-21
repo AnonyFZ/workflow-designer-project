@@ -7,6 +7,9 @@ import cors from 'cors'
 import favicon from 'serve-favicon'
 import start_with_config from './config'
 import router from './routes'
+import webpack from 'webpack'
+import webpackDevMiddleware from 'webpack-dev-middleware'
+import webpackConfig from './webpack.config'
 
 const app = start_with_config(express())
 
@@ -22,6 +25,7 @@ app.use(cors())
 router(app)
 
 if (app.get('env') === 'dev') {
+  app.use(webpackDevMiddleware(webpack(webpackConfig)))
   app.locals.pretty = true
 }
 
