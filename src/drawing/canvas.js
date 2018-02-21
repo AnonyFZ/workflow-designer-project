@@ -1,14 +1,20 @@
+import Arrow from './arrow'
 import hash from 'string-hash'
 
 export default class Canvas {
   constructor(id = 'canvas', width = 500, height = 500) {
     this.canvas = new fabric.Canvas(id, {
       width: width,
-      height: height
+      height: height,
+      selection: false,
+      targetFindTolerance: 15,
+      preserveObjectStacking: true,
+      perPixelTargetFind: true
     })
 
     fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center'
     fabric.Object.prototype.hasControls = false
+    fabric.Arrow = Arrow
 
     this.hashTable = []
   }
@@ -31,6 +37,7 @@ export default class Canvas {
     ]
 
     return new fabric.Group(node, {
+      level: 1,
       type: 'node',
       id: this.generateId(),
       name: name,
@@ -44,6 +51,7 @@ export default class Canvas {
   }
 
   addObject(object) {
+    if (_.isNil(object)) return
     this.canvas.add(object)
   }
 
@@ -57,7 +65,22 @@ export default class Canvas {
     return id
   }
 
-  createLine() {
-    
+  createLine(points = [0, 0, 0, 0]) {
+    return new fabric.Arrow(points, {
+      level: 0,
+      type: 'arrow_line',
+      strokeWidth: 2,
+      stroke: '#000'
+    })
+  }
+
+  renderAll() {
+    let _ = this.canvas.getObjects()
+    _.sort((obj1, obj2) => {
+      if (obj1.level === obj2.level)
+        return obj1.width * obj1.height < obj2.width * obj2.height
+      return obj1.level < obj2.level
+    })
+    this.canvas.renderAll()
   }
 }
