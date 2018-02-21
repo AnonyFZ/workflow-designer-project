@@ -9,7 +9,8 @@ export default {
     new webpack.ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
-      fabric: ['fabric', 'fabric']
+      fabric: ['fabric', 'fabric'],
+      _: 'lodash'
     })
   ],
   module: {
