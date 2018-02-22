@@ -21,7 +21,7 @@ export default class Canvas {
     this.hashTable = []
   }
 
-  createNode(name = 'Undefined', fill = '#fff', left = 0, top = 0, settings = {}) {
+  createNode(name = 'Undefined', fill = '#fff', left = 0, top = 0, limitInput = 1, settings = {}) {
     const node = [
       new fabric.Circle({
         type: 'circle',
@@ -45,7 +45,7 @@ export default class Canvas {
       name: name,
       left: left,
       top: top,
-      limitInput: 1,
+      limitInput: limitInput,
       countInput: 0,
       lines: [],
       settings: settings
