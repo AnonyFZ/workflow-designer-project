@@ -3,6 +3,7 @@ import hash from 'string-hash'
 
 export default class Canvas {
   constructor(id = 'canvas', width = 500, height = 500) {
+    this.id = id
     this.canvas = new fabric.Canvas(id, {
       width: width,
       height: height,
