@@ -3,7 +3,6 @@ import hash from 'string-hash'
 
 export default class Canvas {
   constructor(id = 'canvas', width = 500, height = 500) {
-    this.id = id
     this.canvas = new fabric.Canvas(id, {
       width: width,
       height: height,
@@ -12,13 +11,13 @@ export default class Canvas {
       preserveObjectStacking: true,
       perPixelTargetFind: true
     })
-
-    fabric.device
+    
     fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center'
     fabric.Object.prototype.hoverCursor = 'pointer'
     fabric.Object.prototype.hasControls = fabric.Object.prototype.hasBorders = false
     fabric.Arrow = Arrow
-
+    
+    this.id = id
     this.hashTable = []
   }
 
@@ -63,6 +62,8 @@ export default class Canvas {
   removeObject(...object) {
     if (_.isNil(object)) return
     _.forEach(object, (val) => {
+      if (val.type === 'node' || val.type === 'arrow_line')
+        _.pull(this.hashTable, val.id)
       this.canvas.remove(val)
     })
   }
