@@ -28,7 +28,7 @@ export default class Canvas {
         radius: 35,
         fill: fill,
         stroke: '#000',
-        strokeWidth: 1
+        strokeWidth: 2
       }),
       new fabric.Text(name, {
         type: 'text',
@@ -79,14 +79,14 @@ export default class Canvas {
     return id
   }
 
-  createLine(points = [0, 0, 0, 0], beginNode = null, endNode = null) {
+  createLine(points = [0, 0, 0, 0], color = '#000', beginNode = null, endNode = null) {
     if (_.isNil(beginNode) || _.isNil(endNode)) return
     const arrow = new fabric.Arrow(points, {
       level: 0,
       type: 'arrow_line',
       id: this.generateId(),
-      strokeWidth: 2,
-      stroke: '#000',
+      strokeWidth: 4,
+      stroke: color,
       arrow_size: 10,
       beginId: beginNode.id,
       endId: endNode.id
