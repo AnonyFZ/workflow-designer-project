@@ -50,9 +50,6 @@ export default class Canvas {
       lines: [],
       settings: settings
     })
-    .on('moving', (options) => {
-      let target = options.target
-    })
   }
 
   addObject(...object) {
