@@ -104,7 +104,7 @@ export default class Canvas {
     _.sort((obj1, obj2) => {
       if (obj1.level === obj2.level)
         return obj1.width * obj1.height < obj2.width * obj2.height
-      return obj1.level < obj2.level // debug arrow
+      return obj1.level > obj2.level
     })
     this.canvas.renderAll()
   }
