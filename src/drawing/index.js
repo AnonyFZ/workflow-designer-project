@@ -1,7 +1,9 @@
+// development mode
 import Canvas from './canvas'
 import Setting from './setting'
 import Drawing from './drawing'
 import MoveObject from './moveoject';
+import NodeContextmenu from './node-contextmenu'
 
 const canvas = new Canvas('drawing-canvas', 1500, 1500)
 const setting = new Setting()
@@ -27,3 +29,6 @@ drawing.start()
 
 const moveobject = new MoveObject(canvas)
 moveobject.start()
+
+const nodecontextmenu = new NodeContextmenu(canvas)
+nodecontextmenu.start()
