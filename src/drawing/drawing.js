@@ -2,7 +2,8 @@ export default class Drawing {
   constructor(canvas) {
     this.canvas = canvas
     this.line = null
-    this.circle = null
+    this.begin_circle = null
+    this.end_circle = null
     this.begin_node = null
     this.end_node = null
     this.is_draw = false
@@ -30,8 +31,8 @@ export default class Drawing {
             x2 = opt.target.left, y2 = opt.target.top
         let line = this.canvas.createLine([x1, y1, x2, y2], this.begin_node, this.end_node)
         this.canvas.addObject(line)
-        this.canvas.removeObject(this.line, this.circle)
-        this.line = this.circle = null
+        this.canvas.removeObject(this.line, this.begin_circle, this.end_circle)
+        this.line = this.begin_circle = this.end_circle = null
       }
     } else {
       // when start
@@ -40,16 +41,25 @@ export default class Drawing {
       let pointer = this.canvas.getPointer(opt.e)
       let x1 = opt.target.left, y1 = opt.target.top,
           x2 = pointer.x, y2 = pointer.y
+          
       this.line = new fabric.Line([x1, y1, x2, y2], {
-        level: 99,
+        level: 2,
         strokeWidth: 2,
-        stroke: '#000'
+        stroke: 'red'
       })
 
-      this.circle = new fabric.Circle({
-        level: -99,
+      this.begin_circle = new fabric.Circle({
+        level: 3,
+        radius: 4,
+        fill: 'red',
+        left: x1,
+        top: y1
+      })
+
+      this.end_circle = new fabric.Circle({
+        level: 4,
         radius: 8,
-        fill: '#fff',
+        fill: 'red',
         stroke: '#000',
         strokeWidth: 1,
         left: x2,
@@ -57,7 +67,7 @@ export default class Drawing {
       })
 
       this.begin_node = opt.target
-      this.canvas.addObject(this.line, this.circle)
+      this.canvas.addObject(this.begin_circle, this.line, this.end_circle)
     }
 
     this.canvas.renderAll()
@@ -78,8 +88,9 @@ export default class Drawing {
       }
     }
 
-    this.line.set({x2: x2, y2: y2})
-    this.circle.set({left: x2, top: y2, fill: color})
+    this.line.set({x2: x2, y2: y2, stroke: color})
+    this.begin_circle.set({fill: color})
+    this.end_circle.set({left: x2, top: y2, fill: color})
     this.canvas.renderAll()
   }
 
