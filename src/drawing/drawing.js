@@ -3,10 +3,9 @@ export default class Drawing {
     this.canvas = canvas
     this.line = null
     this.circle = null
-    this.begin_id = null
-    this.end_id = null
-    this.isDraw = false
-    this.ok = false
+    this.begin_node = null
+    this.end_node = null
+    this.is_draw = false
   }
 
   start() {
@@ -21,24 +20,23 @@ export default class Drawing {
 
   mouseDblclick(opt) {
     if (_.isNil(opt.target)) return
-    if (this.isDraw) {
-      // when stop
-      if (this.ok) {
-        this.isDraw = false
-        this.end_id = opt.target.id
+    if (this.is_draw) {
+      // when finish
+      if (this.validateConnection(opt.target)) {
+        this.is_draw = false
+        this.end_node = opt.target
 
         let x1 = this.line.x1, y1 = this.line.y1,
             x2 = opt.target.left, y2 = opt.target.top
-        let line = this.canvas.createLine([x1, y1, x2, y2], this.begin_id, this.end_id)
-
+        let line = this.canvas.createLine([x1, y1, x2, y2], this.begin_node, this.end_node)
         this.canvas.addObject(line)
         this.canvas.removeObject(this.line, this.circle)
         this.line = this.circle = null
       }
     } else {
       // when start
-      this.isDraw = true
-      
+      this.is_draw = true
+
       let pointer = this.canvas.getPointer(opt.e)
       let x1 = opt.target.left, y1 = opt.target.top,
           x2 = pointer.x, y2 = pointer.y
@@ -50,7 +48,7 @@ export default class Drawing {
 
       this.circle = new fabric.Circle({
         level: -99,
-        radius: 10,
+        radius: 8,
         fill: '#fff',
         stroke: '#000',
         strokeWidth: 1,
@@ -58,7 +56,7 @@ export default class Drawing {
         top: y2
       })
 
-      this.begin_id = opt.target.id
+      this.begin_node = opt.target
       this.canvas.addObject(this.line, this.circle)
     }
 
@@ -66,38 +64,47 @@ export default class Drawing {
   }
 
   mouseMove(opt) {
-    if (!this.isDraw) return
+    if (!this.is_draw) return
 
     let pointer = this.canvas.getPointer(opt.e)
     let x2 = pointer.x, y2 = pointer.y
     let color = 'red'
-
-    this.ok = false
-
-    if (_.isObject(opt.target)) {
-      _.forEach(this.canvas.getCanvas().getObjects(), (val) => {
-        if (val.intersectsWithObject(this.circle)) {
-          if (opt.target.type !== 'node') return
-          if (opt.target.id === this.begin_id) return
-
-          // isNode, notSelf
-          x2 = opt.target.left
-          y2 = opt.target.top
-          color = 'green'
-
-          this.ok = true
-          return
-        }
-      })
+    
+    if (!!opt.target) {
+      if (this.validateConnection(opt.target)) {
+        x2 = opt.target.left
+        y2 = opt.target.top
+        color = 'green'
+      }
     }
 
     this.line.set({x2: x2, y2: y2})
-    this.circle.set({
-      left: x2,
-      top: y2,
-      fill: color
+    this.circle.set({left: x2, top: y2, fill: color})
+    this.canvas.renderAll()
+  }
+
+  validateConnection(target) {
+    if (target.type !== 'node') return false
+
+    // self
+    if (target.id === this.begin_node.id) return false
+    // limit input
+    if (target.countInput + 1 > target.limitInput) return false
+
+    let isUndir = false, isSame = false
+    _.forEach(this.begin_node.lines, (lineElm) => {
+      // undir
+      if (target.id === lineElm.beginId) {
+        err.isUndir = true
+        return
+      }
+      // dupplicate
+      if (target.id === lineElm.endId) {
+        err.isSame = true
+        return
+      }
     })
 
-    this.canvas.renderAll()
+    return !isUndir && !isSame
   }
 }
