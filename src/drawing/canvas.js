@@ -15,7 +15,7 @@ export default class Canvas {
     fabric.device
     fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center'
     fabric.Object.prototype.hoverCursor = 'pointer'
-    fabric.Object.prototype.hasControls = false
+    fabric.Object.prototype.hasControls = fabric.Object.prototype.hasBorders = false
     fabric.Arrow = Arrow
 
     this.hashTable = []
@@ -46,6 +46,7 @@ export default class Canvas {
       left: left,
       top: top,
       limitInput: 1,
+      countInput: 0,
       lines: [],
       settings: settings
     })
@@ -78,15 +79,24 @@ export default class Canvas {
     return id
   }
 
-  createLine(points = [0, 0, 0, 0], beginId = -1, endId = -1) {
-    return new fabric.Arrow(points, {
+  createLine(points = [0, 0, 0, 0], beginNode = null, endNode = null) {
+    if (_.isNil(beginNode) || _.isNil(endNode)) return
+    const arrow = new fabric.Arrow(points, {
       level: 0,
       type: 'arrow_line',
+      id: this.generateId(),
       strokeWidth: 2,
       stroke: '#000',
-      beginId: beginId,
-      endId: endId
+      arrow_size: 10,
+      beginId: beginNode.id,
+      endId: endNode.id
     })
+
+    beginNode.lines.push(arrow)
+    endNode.lines.push(arrow)
+    endNode.countInput++
+
+    return arrow
   }
 
   renderAll() {
