@@ -14,16 +14,16 @@ export default class Arrow extends fabric.Line {
 
   _render(ctx) {
     super._render(ctx)
-    const xDiff = this.x2 - this.x1
-    const yDiff = this.y2 - this.y1
-    const angle = Math.atan2(yDiff, xDiff)
+    const x = this.x2 - this.x1
+    const y = this.y2 - this.y1
+    const size = this.arrow_size
+    const angle = Math.atan2(y, x)
     ctx.save()
-    ctx.translate((this.x2 - this.x1) / 2, (this.y2 - this.y1) / 2)
     ctx.rotate(angle)
     ctx.beginPath()
-    ctx.moveTo(5, 0)
-    ctx.lineTo(-5, 5)
-    ctx.lineTo(-5, -5)
+    ctx.moveTo(size, 0)
+    ctx.lineTo(-size, size)
+    ctx.lineTo(-size, -size)
     ctx.closePath()
     ctx.fillStyle = this.stroke
     ctx.fill()
