@@ -1,6 +1,7 @@
 import Canvas from './canvas'
 import Setting from './setting'
 import Drawing from './drawing'
+import MoveObject from './moveoject';
 
 const canvas = new Canvas('drawing-canvas', 1500, 1500)
 const setting = new Setting()
@@ -23,3 +24,6 @@ canvas.renderAll()
 
 const drawing = new Drawing(canvas)
 drawing.start()
+
+const moveobject = new MoveObject(canvas)
+moveobject.start()
