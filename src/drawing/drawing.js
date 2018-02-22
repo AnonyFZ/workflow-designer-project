@@ -29,9 +29,9 @@ export default class Drawing {
 
         let x1 = this.line.x1, y1 = this.line.y1,
             x2 = opt.target.left, y2 = opt.target.top
-        let line = this.canvas.createLine([x1, y1, x2, y2], this.begin_node, this.end_node)
+        let line = this.canvas.createLine([x1, y1, x2, y2], undefined, this.begin_node, this.end_node)
         this.canvas.addObject(line)
-        this.canvas.removeObject(this.line, this.begin_circle, this.end_circle)
+        this.canvas.removeObject(this.begin_circle, this.line, this.end_circle)
         this.line = this.begin_circle = this.end_circle = null
       }
     } else {
@@ -44,13 +44,13 @@ export default class Drawing {
           
       this.line = new fabric.Line([x1, y1, x2, y2], {
         level: 2,
-        strokeWidth: 2,
+        strokeWidth: 4,
         stroke: 'red'
       })
 
       this.begin_circle = new fabric.Circle({
         level: 3,
-        radius: 4,
+        radius: 5,
         fill: 'red',
         left: x1,
         top: y1
@@ -58,10 +58,8 @@ export default class Drawing {
 
       this.end_circle = new fabric.Circle({
         level: 4,
-        radius: 8,
+        radius: 10,
         fill: 'red',
-        stroke: '#000',
-        strokeWidth: 1,
         left: x2,
         top: y2
       })
@@ -88,8 +86,8 @@ export default class Drawing {
       }
     }
 
-    this.line.set({x2: x2, y2: y2, stroke: color})
     this.begin_circle.set({fill: color})
+    this.line.set({x2: x2, y2: y2, stroke: color})
     this.end_circle.set({left: x2, top: y2, fill: color})
     this.canvas.renderAll()
   }
@@ -106,12 +104,12 @@ export default class Drawing {
     _.forEach(this.begin_node.lines, (lineElm) => {
       // undir
       if (target.id === lineElm.beginId) {
-        err.isUndir = true
+        isUndir = true
         return
       }
       // dupplicate
       if (target.id === lineElm.endId) {
-        err.isSame = true
+        isSame = true
         return
       }
     })
