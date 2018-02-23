@@ -91,11 +91,15 @@ export default class NodeContextmenu {
       // remove self at other
       let listObject = _.filter(this.canvas.getCanvas().getObjects(), {type: 'node'})
       _.forEach(listObject, (val) =>
-        _.remove(val.lines, (obj) => 
-          this.target.beginId === obj.beginId || this.target.endId === obj.endId)
+        _.remove(val.lines, (obj) => {
+          // decrease countInput when remove line
+          if (val.id === obj.endId && this.target.endId === obj.endId)
+            val.countInput = val.countInput < 0 ? 0 : val.countInput - 1
+
+          return this.target.beginId === obj.beginId || this.target.endId === obj.endId
+        })
       )
 
-      console.log(listObject)
       this.target = null
     }
   }
@@ -117,9 +121,15 @@ export default class NodeContextmenu {
       // remove lines self at other
       let listObject = _.filter(this.canvas.getCanvas().getObjects(), {type: 'node'})
       _.forEach(listObject, (val) =>
-        _.remove(val.lines, (obj) => 
-          this.target.id === obj.beginId || this.target.id === obj.endId))
-
+        _.remove(val.lines, (obj) => {
+          // decrease countInput when remove node
+          if (val.id === obj.endId && this.target.id === obj.beginId) {
+            val.countInput = val.countInput < 0 ? 0 : val.countInput - 1
+          }
+          this.target.id === obj.beginId || this.target.id === obj.endId
+        })
+      )
+      
       this.target = null
     }
   }
