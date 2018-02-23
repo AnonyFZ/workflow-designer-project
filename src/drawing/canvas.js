@@ -1,7 +1,7 @@
 import hash from 'string-hash'
 import Arrow from './arrow'
 import MoveObject from './moveoject';
-import NodeContextmenu from './node-contextmenu'
+import Contextmenu from './contextmenu'
 
 export default class Canvas {
   constructor(id = 'canvas', width = 500, height = 500) {
@@ -22,7 +22,7 @@ export default class Canvas {
     this.id = id
     this.hashTable = []
 
-    this.nodeContextMenu = new NodeContextmenu(this)
+    this.contextMenu = new Contextmenu(this)
     this.moveObject = new MoveObject(this)
   }
 
@@ -100,12 +100,15 @@ export default class Canvas {
     const arrow = new fabric.Arrow(points, {
       level: 0,
       type: 'arrow_line',
+      name: 'arrow_line',
       id: this.generateId(),
       strokeWidth: 4,
       stroke: color,
       arrow_size: 10,
       beginId: beginNode.id,
-      endId: endNode.id
+      endId: endNode.id,
+      lockMovementX: true,
+      lockMovementY: true
     })
 
     beginNode.lines.push(arrow)
@@ -158,17 +161,18 @@ export default class Canvas {
   }
 
   setAllMovementObjects(isLock = false) {
-    _.forEach(this.canvas.getObjects(), (val) =>
-      val.set({'lockMovementX': isLock, 'lockMovementY': isLock})
-    )
+    _.forEach(this.canvas.getObjects(), (val) => {
+      if (val.type === 'node')
+        val.set({'lockMovementX': isLock, 'lockMovementY': isLock})
+    })
   }
 
   disableContextMenu() {
-    this.nodeContextMenu.stop()
+    this.contextMenu.stop()
   }
 
   enableContextMenu() {
-    this.nodeContextMenu.start()
+    this.contextMenu.start()
   }
 
   disableMoveObject() {
