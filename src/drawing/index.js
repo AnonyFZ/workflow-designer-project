@@ -6,8 +6,6 @@ bug:
 **************************************************************************
 
 hot_fix:
-  - when remove, decrease [countInput]
-  - arrow_line cant detected when moveobject
 
 **************************************************************************/
 
@@ -55,4 +53,3 @@ canvas.renderAll()
 
 const drawing = new Drawing(canvas)
 drawing.start()
-
