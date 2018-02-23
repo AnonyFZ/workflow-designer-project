@@ -7,31 +7,42 @@ export default class NodeContextmenu {
     this.modal_title = $('#modal-title')
     this.modal_body = $('#modal-body')
     this.target = null
+    this.is_over = false
   }
 
-  loadMenu() {
+  nodeItems() {
+    return {
+      'delete': {
+        name: 'Delete',
+        icon: 'fa-trash'
+      },
+      'sep': '---------',
+      'settings': {
+        name: 'Settings',
+        icon: 'fa-pencil-square-o'
+      }
+    }
+  }
+
+  arrowItems() {
+    return {
+      'delete': {
+        name: 'Delete',
+        icon: 'fa-trash'
+      }
+    }
+  }
+
+  loadMenu(items, callback) {
     $.contextMenu({
       selector: this.canvas_class,
       className: 'data-title',
-      callback: this.contextMenuCallback.bind(this),
-      items: {
-        'delete': {
-          name: 'Delete',
-          icon: 'fa-trash'
-        },
-        'sep': '---------',
-        'settings': {
-          name: 'Settings',
-          icon: 'fa-pencil-square-o'
-        }
-      }
+      callback: callback.bind(this),
+      items: items()
     })
-    $(this.canvas_class).contextMenu(false)
   }
 
   start() {
-    this.loadMenu()
-
     this.canvas.onEventListener('mouse:over', this.mouseOver.bind(this))
     this.canvas.onEventListener('mouse:out', this.mouseOut.bind(this))
   }
@@ -44,29 +55,63 @@ export default class NodeContextmenu {
 
   mouseOver(opt) {
     if (_.isNil(opt.target)) return
-    if (opt.target.type !== 'node') return
-    
-    this.target = opt.target
-    $('.data-title').attr('data-menutitle', `${opt.target.name}, ${opt.target.id}`)
+    if (!this.is_over) {
+      $(this.canvas_class).contextMenu('destroy')
+      $(this.canvas_class).contextMenu(true)
 
-    $(this.canvas_class).contextMenu(true)
+      if (opt.target.type === 'node') 
+        this.loadMenu(this.nodeItems, this.nodeContextMenuCallback)
+      else if (opt.target.type === 'arrow_line') 
+        this.loadMenu(this.arrowItems, this.arrowContextMenuCallback)
+      else return
+      
+      $('.data-title').attr('data-menutitle', `${opt.target.name}, ${opt.target.id}`)
+
+      this.target = opt.target
+      this.is_over = true
+    }
   }
 
   mouseOut(opt) {
     if (_.isNil(opt.target)) return
-    if (opt.target.type !== 'node') return
 
+    this.is_over = false
     $(this.canvas_class).contextMenu(false)
   }
 
-  contextMenuCallback(key, opt) {
+  arrowContextMenuCallback(key, opt) {
     if (key === 'delete')
-      this.deleteKeyContextMenu()
-    else if (key === 'settings')
-      this.settingsKeyContextMenu()
+      this.arrowDeleteKeyContextMenu()
   }
 
-  deleteKeyContextMenu() {
+  arrowDeleteKeyContextMenu() {
+    if (confirm('Are you sure?')) {
+      this.canvas.removeObject(this.target)
+
+      // remove self at other
+      let listObject = _.filter(this.canvas.getCanvas().getObjects(), {type: 'node'})
+      _.forEach(listObject, (val) =>
+        _.remove(val.lines, (obj) => {
+          // decrease countInput when remove line
+          if (val.id === obj.endId && this.target.endId === obj.endId)
+            val.countInput = val.countInput < 0 ? 0 : val.countInput - 1
+
+          return this.target.beginId === obj.beginId || this.target.endId === obj.endId
+        })
+      )
+
+      this.target = null
+    }
+  }
+
+  nodeContextMenuCallback(key, opt) {
+    if (key === 'delete')
+      this.nodeDeleteKeyContextMenu()
+    else if (key === 'settings')
+      this.nodeSettingsKeyContextMenu()
+  }
+
+  nodeDeleteKeyContextMenu() {
     if (confirm('Are you sure?')) {
 
       // remove lines in self
@@ -76,14 +121,20 @@ export default class NodeContextmenu {
       // remove lines self at other
       let listObject = _.filter(this.canvas.getCanvas().getObjects(), {type: 'node'})
       _.forEach(listObject, (val) =>
-        _.remove(val.lines, (obj) => 
-          this.target.id === obj.beginId || this.target.id === obj.endId))
-
+        _.remove(val.lines, (obj) => {
+          // decrease countInput when remove node
+          if (val.id === obj.endId && this.target.id === obj.beginId) {
+            val.countInput = val.countInput < 0 ? 0 : val.countInput - 1
+          }
+          this.target.id === obj.beginId || this.target.id === obj.endId
+        })
+      )
+      
       this.target = null
     }
   }
 
-  settingsKeyContextMenu() {
+  nodeSettingsKeyContextMenu() {
     this.modal_title.text(`${this.target.name}-${this.target.type}-${this.target.id}`)
     this.modal_body.html('')
 

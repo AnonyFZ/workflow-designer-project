@@ -4,14 +4,7 @@ export default class Arrow extends fabric.Line {
   constructor(points, objObjects) {
     super(points, objObjects)
   }
-
-  _getCacheCanvasDimensions() {
-    var dim = super._getCacheCanvasDimensions()
-    dim.width += 15
-    dim.height += 15
-    return dim
-  }
-
+  
   _render(ctx) {
     super._render(ctx)
     const x = this.x2 - this.x1

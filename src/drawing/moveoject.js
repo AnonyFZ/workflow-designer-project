@@ -13,10 +13,15 @@ export default class MoveObject {
 
   objectMoving (opt) {
     _.forEach(opt.target.lines, (lineElm) => {
+      
       if (opt.target.id === lineElm.beginId)
         lineElm.set({x1: opt.target.left, y1: opt.target.top})
       else if (opt.target.id === lineElm.endId)
         lineElm.set({x2: opt.target.left, y2: opt.target.top})
+      
+      // update coords
+      lineElm.setCoords()
+      opt.target.setCoords()
       this.canvas.renderAll()
     })
   }
