@@ -1,11 +1,13 @@
 version: '3'
 services:
-  web:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     container_name: workflow-designer-development
-    image: "anonyfz/workflow-designer-project:develop"
     ports:
      - "8888:8888"
     volumes:
-     - .:/usr/src/app
+     - ..:/usr/src/app
     stdin_open: true
     tty: true

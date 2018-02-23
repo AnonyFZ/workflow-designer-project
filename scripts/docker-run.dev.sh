@@ -1,3 +1,7 @@
 #!/bin/sh
-docker-compose -f docker-compose.dev.yml down && \
-docker-compose -f docker-compose.dev.yml up
+# remove old
+docker-compose -f docker/docker-compose.dev.yml down && \
+
+# rebuild image
+docker-compose -f docker/docker-compose.dev.yml build && \
+docker-compose -f docker/docker-compose.dev.yml up
