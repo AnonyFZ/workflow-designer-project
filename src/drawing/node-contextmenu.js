@@ -67,11 +67,20 @@ export default class NodeContextmenu {
   }
 
   deleteKeyContextMenu() {
-    _.forEach(this.target.lines, (val) => {
-      this.canvas.removeObject(val)
-    })
-    this.canvas.removeObject(this.target)
-    this.target = null
+    if (confirm('Are you sure?')) {
+
+      // remove lines in self
+      _.forEach(this.target.lines, (val) => this.canvas.removeObject(val))
+      this.canvas.removeObject(this.target)
+      
+      // remove lines self at other
+      let listObject = _.filter(this.canvas.getCanvas().getObjects(), {type: 'node'})
+      _.forEach(listObject, (val) =>
+        _.remove(val.lines, (obj) => 
+          this.target.id === obj.beginId || this.target.id === obj.endId))
+
+      this.target = null
+    }
   }
 
   settingsKeyContextMenu() {
