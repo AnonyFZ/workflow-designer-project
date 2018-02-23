@@ -12,11 +12,13 @@ export default class Drawing {
   start() {
     this.canvas.onEventListener('mouse:dblclick', this.mouseDblclick.bind(this))
     this.canvas.onEventListener('mouse:move', this.mouseMove.bind(this))
+    this.canvas.onEventListener('mouse:up', this.mouseUp.bind(this))
   }
 
   stop() {
     this.canvas.offEventListener('mouse:dblclick')
     this.canvas.offEventListener('mouse:move')
+    this.canvas.offEventListener('mouse:up')
   }
 
   mouseDblclick(opt) {
@@ -24,21 +26,18 @@ export default class Drawing {
     if (this.is_draw) {
       // when finish
       if (this.validateConnection(opt.target)) {
-        this.is_draw = false
         this.end_node = opt.target
 
         let x1 = this.line.x1, y1 = this.line.y1,
             x2 = opt.target.left, y2 = opt.target.top
         let line = this.canvas.createLine([x1, y1, x2, y2], undefined, this.begin_node, this.end_node)
         this.canvas.addObject(line)
-        this.canvas.removeObject(this.begin_circle, this.line, this.end_circle)
-        this.line = this.begin_circle = this.end_circle = null
-        this.canvas.unlockMovement()
+        this.cleanDrawing()
       }
     } else {
       // when start
       this.is_draw = true
-      this.canvas.lockMovement()
+      this.canvas._d()
       
       let pointer = this.canvas.getPointer(opt.e)
       let x1 = opt.target.left, y1 = opt.target.top,
@@ -55,7 +54,9 @@ export default class Drawing {
         radius: 5,
         fill: 'red',
         left: x1,
-        top: y1
+        top: y1,
+        lockMovementX: true,
+        lockMovementY: true
       })
 
       this.end_circle = new fabric.Circle({
@@ -117,5 +118,19 @@ export default class Drawing {
     })
 
     return !isUndir && !isSame
+  }
+
+  cleanDrawing() {
+    this.is_draw = false
+    
+    this.canvas.removeObject(this.begin_circle, this.line, this.end_circle)
+    this.line = this.begin_circle = this.end_circle = null
+    this.begin_node = this.end_node = null
+    this.canvas._e()
+  }
+
+  mouseUp(opt) {
+    if (!this.is_draw) return
+    if (_.isNil(opt.target)) this.cleanDrawing()
   }
 }
