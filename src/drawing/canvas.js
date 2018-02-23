@@ -1,5 +1,7 @@
-import Arrow from './arrow'
 import hash from 'string-hash'
+import Arrow from './arrow'
+import MoveObject from './moveoject';
+import NodeContextmenu from './node-contextmenu'
 
 export default class Canvas {
   constructor(id = 'canvas', width = 500, height = 500) {
@@ -19,6 +21,21 @@ export default class Canvas {
     
     this.id = id
     this.hashTable = []
+
+    this.nodeContextMenu = new NodeContextmenu(this)
+    this.moveObject = new MoveObject(this)
+  }
+
+  _e() {
+    this.unlockMovement()
+    this.enableMoveObject()
+    this.enableContextMenu()
+  }
+
+  _d() {
+    this.lockMovement()
+    this.disableMoveObject()
+    this.disableContextMenu()
   }
 
   createNode(name = 'Undefined', fill = '#fff', left = 0, top = 0, limitInput = 1, settings = {}) {
@@ -144,5 +161,21 @@ export default class Canvas {
     _.forEach(this.canvas.getObjects(), (val) =>
       val.set({'lockMovementX': isLock, 'lockMovementY': isLock})
     )
+  }
+
+  disableContextMenu() {
+    this.nodeContextMenu.stop()
+  }
+
+  enableContextMenu() {
+    this.nodeContextMenu.start()
+  }
+
+  disableMoveObject() {
+    this.moveObject.stop()
+  }
+
+  enableMoveObject() {
+    this.moveObject.start()
   }
 }
