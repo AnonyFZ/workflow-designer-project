@@ -1,5 +1,5 @@
 export default class Setting {
-  addSetting(type = 'default', ...values) {
+  addSetting(type = 'default', values = {}) {
     let o = {
       'default': {
         value: 0,
@@ -16,7 +16,7 @@ export default class Setting {
     let settings = _.assign(o[type], o.default)
     let index = 0
     _.forEach(settings, (val, key) => {
-      settings[key] = values[index++]
+      settings[key] = values[key]
     })
 
     return _.assign({type: type}, settings)
