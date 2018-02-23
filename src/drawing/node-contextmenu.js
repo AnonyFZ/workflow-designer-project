@@ -26,7 +26,6 @@ export default class NodeContextmenu {
         }
       }
     })
-
     $(this.canvas_class).contextMenu(false)
   }
 
@@ -40,6 +39,7 @@ export default class NodeContextmenu {
   stop() {
     this.canvas.offEventListener('mouse:over')
     this.canvas.offEventListener('mouse:out')
+    $(this.canvas_class).contextMenu('destroy')
   }
 
   mouseOver(opt) {
