@@ -16,6 +16,7 @@ export default class Canvas {
     
     fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center'
     fabric.Object.prototype.hoverCursor = 'pointer'
+    fabric.Object.prototype.objectCaching = false // fix cant select object
     fabric.Object.prototype.hasControls = fabric.Object.prototype.hasBorders = false
     fabric.Arrow = Arrow
     
