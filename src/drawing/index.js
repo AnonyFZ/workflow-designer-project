@@ -1,12 +1,17 @@
-// development mode
+/** development mode
+  bug: 
+    - when drawing finished, cant already right click
+**/
+
 import Canvas from './canvas'
 import Setting from './setting'
 import Drawing from './drawing'
-import MoveObject from './moveoject';
-import NodeContextmenu from './node-contextmenu'
-
 const canvas = new Canvas('drawing-canvas', 1500, 1500)
 const setting = new Setting()
+
+// prevent right click on page
+document.addEventListener('contextmenu', event => event.preventDefault())
+canvas._e()
 
 const nodeBlur = canvas.createNode('GaussianBlur', undefined, 50, 50, 1, {
   'sigmaX': setting.addSetting('input', {
@@ -43,8 +48,3 @@ canvas.renderAll()
 const drawing = new Drawing(canvas)
 drawing.start()
 
-const moveobject = new MoveObject(canvas)
-moveobject.start()
-
-const nodecontextmenu = new NodeContextmenu(canvas)
-nodecontextmenu.start()
