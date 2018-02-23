@@ -131,4 +131,18 @@ export default class Canvas {
   getCanvas() {
     return this.canvas
   }
+
+  lockMovement() {
+    this.setAllMovementObjects(true)
+  }
+
+  unlockMovement() {
+    this.setAllMovementObjects(false)    
+  }
+
+  setAllMovementObjects(isLock = false) {
+    _.forEach(this.canvas.getObjects(), (val) =>
+      val.set({'lockMovementX': isLock, 'lockMovementY': isLock})
+    )
+  }
 }
