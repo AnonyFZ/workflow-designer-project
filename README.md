@@ -8,6 +8,13 @@
 - Chrome (all versions)
 - IE10, IE11, Edge
 
+## System Specification
+
+- Installed docker
+- Installed web browser
+- Allowed your firewall (docker bind port 8888)
+- Have speed internet (docker images and node_modules are big)
+
 ## Contributions
 
 - [Mr. Nattakit Boonyang](https://www.linkedin.com/in/nattakit-boonyang-3188b5157)
