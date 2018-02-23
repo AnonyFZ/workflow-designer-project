@@ -1,7 +1,15 @@
-/** development mode
-  bug: 
-    - when drawing finished, cant already right click
-**/
+/*********************** development mode ********************************
+
+bug: 
+  - when drawing finished, cant already right click
+
+**************************************************************************
+
+hot_fix:
+  - when remove, decrease [countInput]
+  - arrow_line cant detected when moveobject
+
+**************************************************************************/
 
 import Canvas from './canvas'
 import Setting from './setting'
