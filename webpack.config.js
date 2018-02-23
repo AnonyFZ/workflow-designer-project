@@ -26,10 +26,6 @@ export default {
         }
       },
       {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader']
-      },
-      {
         test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         loader: 'file-loader',
       },
@@ -37,6 +33,14 @@ export default {
         test: /\.(ttf|eot|svg)(\?[\s\S]+)?$/,
         loader: 'file-loader',
       },
+      {
+        test: /\.(png|jpg|gif)$/,
+        loader: 'file-loader'
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      }
     ]
   },
   output: {
