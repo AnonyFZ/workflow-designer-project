@@ -33,11 +33,13 @@ export default class Drawing {
         this.canvas.addObject(line)
         this.canvas.removeObject(this.begin_circle, this.line, this.end_circle)
         this.line = this.begin_circle = this.end_circle = null
+        this.canvas.unlockMovement()
       }
     } else {
       // when start
       this.is_draw = true
-
+      this.canvas.lockMovement()
+      
       let pointer = this.canvas.getPointer(opt.e)
       let x1 = opt.target.left, y1 = opt.target.top,
           x2 = pointer.x, y2 = pointer.y
