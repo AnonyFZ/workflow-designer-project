@@ -21,10 +21,13 @@ export default class Canvas {
     fabric.Arrow = Arrow
     
     this.id = id
-    this.hashTable = []
+    this.hash_table = []
 
-    this.contextMenu = new Contextmenu(this)
-    this.moveObject = new MoveObject(this)
+    this.nodes_map = new Map()
+    this.lines_map = new Map()
+
+    this.context_menu = new Contextmenu(this)
+    this.move_object = new MoveObject(this)
   }
 
   _e() {
@@ -40,6 +43,7 @@ export default class Canvas {
   }
 
   createNode(name = 'Undefined', fill = '#fff', left = 0, top = 0, limitInput = 1, settings = {}) {
+    const node_id = this.generateId()
     const node = [
       new fabric.Circle({
         type: 'circle',
@@ -55,11 +59,10 @@ export default class Canvas {
         fill: '#000'
       })
     ]
-
-    return new fabric.Group(node, {
+    const node_group = new fabric.Group(node, {
       level: 1,
       type: 'node',
-      id: this.generateId(),
+      id: node_id,
       name: name,
       left: left,
       top: top,
@@ -68,6 +71,9 @@ export default class Canvas {
       lines: [],
       settings: settings
     })
+
+    this.nodes_map.set(node_id, node_group) // add node map
+    return node_group
   }
 
   addObject(...object) {
@@ -81,7 +87,7 @@ export default class Canvas {
     if (_.isNil(object)) return
     _.forEach(object, (val) => {
       if (val.type === 'node' || val.type === 'arrow_line')
-        _.pull(this.hashTable, val.id)
+        _.pull(this.hash_table, val.id)
       this.canvas.remove(val)
     })
   }
@@ -90,9 +96,9 @@ export default class Canvas {
     let id
     do
       id = hash(_.toString(_.random(9999990, true))) 
-    while(_.some(this.hashTable, id))
+    while(_.some(this.hash_table, id))
 
-    this.hashTable.push(id)
+    this.hash_table.push(id)
     return id
   }
 
@@ -112,10 +118,10 @@ export default class Canvas {
       lockMovementY: true
     })
 
+    lines_map.set(arrow.id, arrow) // add arrow map with hash_table
     beginNode.lines.push(arrow)
     endNode.lines.push(arrow)
     endNode.countInput++
-
     return arrow
   }
 
@@ -169,18 +175,18 @@ export default class Canvas {
   }
 
   disableContextMenu() {
-    this.contextMenu.stop()
+    this.context_menu.stop()
   }
 
   enableContextMenu() {
-    this.contextMenu.start()
+    this.context_menu.start()
   }
 
   disableMoveObject() {
-    this.moveObject.stop()
+    this.move_object.stop()
   }
 
   enableMoveObject() {
-    this.moveObject.start()
+    this.move_object.start()
   }
 }
