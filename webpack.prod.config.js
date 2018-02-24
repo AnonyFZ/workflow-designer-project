@@ -1,11 +1,14 @@
-import webpack from 'webpack'
+const webpack = require('webpack')
+const uglifyjsPlugin = require('uglifyjs-webpack-plugin')
+const path = require('path')
 
-export default {
+module.exports = {
   entry: {
-    app: './src/index.js'
+    app: './src/index.prod.js'
   },
   devtool: 'source-map',
   plugins: [
+    new uglifyjsPlugin(),
     new webpack.ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
@@ -44,6 +47,8 @@ export default {
     ]
   },
   output: {
-    filename: './js/bundle.js'
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'temp'),
+    publicPath: './temp/'
   },
 }
