@@ -9,7 +9,7 @@ import start_with_config from './config'
 import router from './routes'
 import webpack from 'webpack'
 import webpackDevMiddleware from 'webpack-dev-middleware'
-import webpackConfig from './webpack.config'
+import webpackDevConfig from './webpack.dev.config'
 
 const app = start_with_config(express())
 
@@ -24,8 +24,8 @@ app.use(favicon(path.join(__dirname, 'public/favicon.ico')))
 app.use(cors())
 
 if (app.get('env') === 'dev') {
-  app.use(webpackDevMiddleware(webpack(webpackConfig)))
   app.use(express.static(path.join(__dirname, 'node_modules')))
+  app.use(webpackDevMiddleware(webpack(webpackDevConfig)))
   app.locals.pretty = true
 }
 
