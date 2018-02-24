@@ -52,7 +52,7 @@ export default class Canvas {
         stroke: '#000',
         strokeWidth: 2
       }),
-      new fabric.Text(name, {
+      new fabric.Text(node_id, { //name, {
         type: 'text',
         fontFamily: 'sans-serif',
         fontSize: 10,
@@ -86,8 +86,14 @@ export default class Canvas {
   removeObject(...object) {
     if (_.isNil(object)) return
     _.forEach(object, (val) => {
-      if (val.type === 'node' || val.type === 'arrow_line')
+      if (val.type === 'node' || val.type === 'arrow_line') {
+        if (val.type === 'node')
+          this.nodes_map.delete(val.id)
+        else if (val.type === 'arrow_line')
+          this.lines_map.delete(val.id)
+
         _.pull(this.hash_table, val.id)
+      }
       this.canvas.remove(val)
     })
   }
@@ -95,7 +101,7 @@ export default class Canvas {
   generateId() {
     let id
     do
-      id = hash(_.toString(_.random(9999990, true))) 
+      id = _.toString(hash(_.toString(_.random(9999990, true))))
     while(_.some(this.hash_table, id))
 
     this.hash_table.push(id)
@@ -118,7 +124,7 @@ export default class Canvas {
       lockMovementY: true
     })
 
-    lines_map.set(arrow.id, arrow) // add arrow map with hash_table
+    this.lines_map.set(arrow.id, arrow) // add arrow map with hash_table
     beginNode.lines.push(arrow)
     endNode.lines.push(arrow)
     endNode.countInput++
@@ -129,9 +135,10 @@ export default class Canvas {
     let _ = this.canvas.getObjects()
     _.sort((obj1, obj2) => {
       if (obj1.level === obj2.level)
-        return obj1.width * obj1.height < obj2.width * obj2.height
+      return obj1.width * obj1.height < obj2.width * obj2.height
       return obj1.level > obj2.level
     })
+    
     this.canvas.renderAll()
   }
 
