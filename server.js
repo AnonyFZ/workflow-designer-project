@@ -22,6 +22,12 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(favicon(path.join(__dirname, 'public/favicon.ico')))
 app.use(cors())
+
+// pass app env with middleware
+app.use((req, res, next) => {
+  res.locals.env = app.get('env')
+  next()
+})
 router(app)
 
 if (app.get('env') === 'dev') {
