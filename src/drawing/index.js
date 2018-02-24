@@ -6,7 +6,8 @@ bug:
 **************************************************************************
 
 hot_fix:
-
+  - delete line but delete all connection too
+  
 **************************************************************************/
 
 import Canvas from './canvas'
@@ -30,7 +31,7 @@ const nodeBlur = canvas.createNode('GaussianBlur', undefined, 50, 50, 1, {
   })
 })
 
-const nodeRotate = canvas.createNode('Rotate', undefined, 170, 170, 1, {
+const nodeRotate = canvas.createNode('Rotate', undefined, 170, 300, 1, {
   'angle': setting.addSetting('slider', {
     value: 0,
     default_value: 0,
@@ -48,7 +49,9 @@ const nodeZoom = canvas.createNode('Zoom', undefined, 250, 50, 1, {
   })
 })
 
-canvas.addObject(nodeBlur, nodeRotate, nodeZoom)
+const nodeConvertGrayScale = canvas.createNode('ConvertGrayScale', undefined, 170, 170, 3, {})
+
+canvas.addObject(nodeBlur, nodeRotate, nodeZoom, nodeConvertGrayScale)
 canvas.renderAll()
 
 const drawing = new Drawing(canvas)
