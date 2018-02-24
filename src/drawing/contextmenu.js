@@ -79,6 +79,11 @@ export default class NodeContextmenu {
     $(this.canvas_class).contextMenu(false)
   }
 
+  decreaseToZero(number) {
+    number.countInput = number.countInput < 0 ? 0 : number.countInput - 1
+    return number
+  }
+
   arrowContextMenuCallback(key, opt) {
     if (key === 'delete')
       this.arrowDeleteKeyContextMenu()
@@ -86,19 +91,14 @@ export default class NodeContextmenu {
 
   arrowDeleteKeyContextMenu() {
     if (confirm('Are you sure?')) {
+      let objects = this.canvas.getCanvas().getObjects()
+      let objectBegin = _.filter(objects, {type: 'node', id: this.target.beginId})[0]
+      let objectEnd = _.filter(objects, {type: 'node', id: this.target.endId})[0]
+      
+      objectEnd = this.decreaseToZero(objectEnd)
       this.canvas.removeObject(this.target)
-
-      // remove self at other
-      let listObject = _.filter(this.canvas.getCanvas().getObjects(), {type: 'node'})
-      _.forEach(listObject, (val) =>
-        _.remove(val.lines, (obj) => {
-          // decrease countInput when remove line
-          if (val.id === obj.endId && this.target.endId === obj.endId)
-            val.countInput = val.countInput < 0 ? 0 : val.countInput - 1
-
-          return this.target.beginId === obj.beginId || this.target.endId === obj.endId
-        })
-      )
+      _.remove(objectBegin.lines, {id: this.target.id})
+      _.remove(objectEnd.lines, {id: this.target.id})
 
       this.target = null
     }
