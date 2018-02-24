@@ -49,7 +49,7 @@ const nodeZoom = canvas.createNode('Zoom', undefined, 250, 50, 1, {
   })
 })
 
-const nodeConvertGrayScale = canvas.createNode('ConvertGrayScale', undefined, 170, 170, 3, {})
+const nodeConvertGrayScale = canvas.createNode('ConvertGrayScale', undefined, 170, 170, 2, {})
 
 canvas.addObject(nodeBlur, nodeRotate, nodeZoom, nodeConvertGrayScale)
 canvas.renderAll()
