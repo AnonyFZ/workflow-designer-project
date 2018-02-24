@@ -23,16 +23,17 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(favicon(path.join(__dirname, 'public/favicon.ico')))
 app.use(cors())
 
+if (app.get('env') === 'dev') {
+  app.use(webpackDevMiddleware(webpack(webpackConfig)))
+  app.use(express.static(path.join(__dirname, 'node_modules')))
+  app.locals.pretty = true
+}
+
 // pass app env with middleware
 app.use((req, res, next) => {
   res.locals.env = app.get('env')
   next()
 })
 router(app)
-
-if (app.get('env') === 'dev') {
-  app.use(webpackDevMiddleware(webpack(webpackConfig)))
-  app.locals.pretty = true
-}
 
 app.listen(app.get('port'))
