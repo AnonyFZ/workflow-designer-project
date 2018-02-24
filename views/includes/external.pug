@@ -1,2 +1,7 @@
-include link.pug
-include js.pug
+link(rel="icon", href="/favicon.ico")
+
+if (env == 'dev')
+  include ./dev/link.pug
+  include ./dev/js.pug
+else if (env === 'prod')
+  script(src="/bundle.js")
