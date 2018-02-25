@@ -5,14 +5,18 @@ export default class {
   }
 
   _() {
-    this.code_map.set('Load Image', 1)
+    this.code_map.set('Start', -1)
+    this.code_map.set('Stop', 1)
+    this.code_map.set('Load Image', 2)
 
     // for debug
-    for (let i = 1; i <= 3; i++)
-      this.code_map.set(`node_${i}`, 1 + i)
+    for (let i = 1; i <= 5; i++)
+      this.code_map.set(`node_${i}`, 2 + i)
+
   }
 
   getCode(name) {
-    return this.code_map.get(name) || 0 // not found
+    console.log(name, this.code_map.get(name))
+    return this.code_map.get(name) || null // not found
   }
 }

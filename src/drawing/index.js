@@ -21,8 +21,8 @@ const setting = new Setting()
 document.addEventListener('contextmenu', event => event.preventDefault())
 canvas._e()
 
-for (let i = 1; i <= 3; i++)
-  canvas.addObject(canvas.createNode(`node_${i}`, undefined, _.random(36, 200), _.random(36, 300), 99, setting.addSetting('input', {
+for (let i = 1; i <= 5; i++)
+  canvas.addObject(canvas.createNode(`node_${i}`, 'lightgray', _.random(36, 200), _.random(36, 300), 99, setting.addSetting('input', {
     default_value: _.random(0, 999),
     value: _.random(0, 99)
   })))
