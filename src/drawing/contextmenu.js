@@ -6,6 +6,7 @@ export default class NodeContextmenu {
     this.modal_settings = $('#modal-settings')
     this.modal_title = $('#modal-title')
     this.modal_body = $('#modal-body')
+    this.res_file_path = null
     this.target = null
     this.is_over = false
   }
@@ -147,7 +148,11 @@ export default class NodeContextmenu {
         const object = $(`#${val.type}-${key}-${this.target.id}`)
         if (val.type === 'slider')
           val.value = object.slider('value')
-        else
+        else if (val.type === 'file') {
+          if (_.isNil(this.res_file_path)) return
+          val.file = this.res_file_path
+          this.res_file_path = null
+        } else
           val.value = object.val()
       })
 
@@ -168,7 +173,7 @@ export default class NodeContextmenu {
     const label = $('<label>', {
       class: 'form-control-label',
       for: objectId
-    }).text(key).appendTo(form_group)
+    }).text(`${key}:`).appendTo(form_group)
 
     if (val.type === 'input') {
       // create input element
@@ -205,6 +210,62 @@ export default class NodeContextmenu {
           slide: (e, ui) => {
             div_ui_slider_handle.text(ui.value)
           }
+      })
+    } else if (val.type === 'file') {
+      const span_status = $('<span>', {
+        id: `form-msg-${val.type}-${objectId}`
+      }).appendTo(form_group)
+
+      const form = $("<form>", {
+        enctype: 'multipart/form-data',
+        action: `/api/upload/${this.target.id}`,
+        method: "POST",
+        id: `form-${val.type}-${objectId}`,
+      }).appendTo(form_group)
+
+      const field = $('<div>', {
+        class: 'file-field input-field'
+      }).appendTo(form)
+
+      const input_file = $('<input>', {
+        type: 'file',
+        class: 'form-control-file',
+        name: 'uploadImage'
+      }).appendTo(field)
+
+      const button = $('<button>', {
+        class: 'btn',
+        type: 'submit'
+      }).text('Upload Image').appendTo(form)
+
+      $(`#form-${val.type}-${objectId}`).on('submit', e => {
+        e.preventDefault()
+
+        if (!confirm('Are you sure?')) return
+        
+        const file_form = $(`#form-${val.type}-${objectId}`)[0]
+        const data = new FormData(file_form)
+
+        $.ajax({
+          type: 'POST',
+          enctype: 'multipart/form-data',
+          url: `http://127.0.0.1:8888/api/upload/${this.target.id}`,
+          data: data,
+          processData: false,
+          contentType: false,
+          cache: false,
+          timeout: 600000,
+          success: function(data) {
+            $(`#form-msg-${val.type}-${objectId}`).text(`  ${data.msg}`)
+
+            if (data.hasOwnProperty('status')) {
+              this.res_file_path = data.file
+            }
+          },
+          error: function(e) {
+            console.log('ERROR: ', e)
+          }
+        })
       })
     }
   }

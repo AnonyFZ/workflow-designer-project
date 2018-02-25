@@ -1,7 +1,6 @@
 import express from 'express'
 import path from 'path'
 import bodyParser from 'body-parser'
-import multer from 'multer'
 import methodOverride from 'method-override'
 import cors from 'cors'
 import favicon from 'serve-favicon'
@@ -16,9 +15,9 @@ const app = start_with_config(express())
 app.set('views', path.join(__dirname, '../views'))
 app.set('view engine', 'pug')
 
-app.use(methodOverride())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
+app.use(methodOverride())
 app.use(express.static(path.join(__dirname, '../public')))
 app.use(favicon(path.join(__dirname, '../public/favicon.ico')))
 app.use(cors())

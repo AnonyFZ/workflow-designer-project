@@ -3,5 +3,4 @@ ENV NODE_ENV development
 WORKDIR /usr/src/app
 EXPOSE 8888
 CMD echo "waiting npm install..." && \
-    npm install && \
-    DEBUG=* npm run start-with-babel-env server.js
+    npm run start-with-babel-env

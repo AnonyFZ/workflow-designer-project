@@ -11,6 +11,9 @@ export default class Setting {
         min_value: 0,
         max_value: 0
       },
+      'upload': {
+        file: null
+      }
     }
 
     let settings = _.assign(o[type], o.default)

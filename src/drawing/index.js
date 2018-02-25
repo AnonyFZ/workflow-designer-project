@@ -9,27 +9,39 @@ hot_fix:
   
 **************************************************************************/
 
-import Canvas from './canvas'
-import Setting from './setting'
-import Drawing from './drawing'
-import Processing from '../processing'
+import Canvas from "./canvas";
+import Setting from "./setting";
+import Function from "./node-function";
+import Drawing from "./drawing";
+import ContextMenu from './contextmenu'
 
-const canvas = new Canvas('drawing-canvas', 500, 500)
-const setting = new Setting()
+const drawing_canvas = new Canvas("drawing-canvas", 0, 0);
+const nodes_canvas = new Canvas("nodes-canvas", 0, 0);
+const setting = new Setting();
+const drawing = new Drawing(drawing_canvas);
+const context_menu = new ContextMenu(drawing_canvas)
 
 // prevent right click on page
-document.addEventListener('contextmenu', event => event.preventDefault())
-canvas._e()
+// window.addEventListener("contextmenu", event => event.preventDefault());
+window.addEventListener("load", e => {
+  drawing_canvas.resizeCanvas("#drawing-wrapping");
+  nodes_canvas.resizeCanvas("#nodes-wrapping");
 
-for (let i = 1; i <= 5; i++)
-  canvas.addObject(canvas.createNode(`node_${i}`, 'lightgray', _.random(36, 200), _.random(36, 300), 99, setting.addSetting('input', {
-    default_value: _.random(0, 999),
-    value: _.random(0, 99)
-  })))
+  drawing_canvas.renderAll();
+  nodes_canvas.renderAll();
 
-canvas.renderAll()
+  drawing.start();
+  context_menu.start()
+});
+window.addEventListener("resize", e => {
+  drawing_canvas.resizeCanvas("#drawing-wrapping");
+  nodes_canvas.resizeCanvas("#nodes-wrapping");
+});
 
-const drawing = new Drawing(canvas)
-drawing.start()
-
-const processing = new Processing(canvas)
+drawing_canvas.addObject(
+  drawing_canvas.createNode("Load Image", "rgb(51,0,102)", 100, 100, 0, {
+    'uploadImage': setting.addSetting("file", {
+      file: null
+    })
+  })
+);
