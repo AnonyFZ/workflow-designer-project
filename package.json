@@ -4,7 +4,7 @@
   "description": "The software for simple workflow design to process images.",
   "main": "index.js",
   "scripts": {
-    "start-with-babel-env": "DEBUG=express:*,webpack ./node_modules/.bin/nodemon --exec ./node_modules/.bin/babel-node --presets=env src-server/server.js"
+    "start-with-babel-env": "DEBUG=webpack ./node_modules/.bin/nodemon --exec ./node_modules/.bin/babel-node --presets=env src-server/server.js"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
