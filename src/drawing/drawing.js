@@ -23,6 +23,8 @@ export default class Drawing {
 
   mouseDblclick(opt) {
     if (_.isNil(opt.target)) return
+    if (opt.target.type !== 'node') return
+
     if (this.is_draw) {
       // when finish
       if (this.validateConnection(opt.target)) {
