@@ -69,6 +69,7 @@ export default class Canvas {
       limitInput: limitInput,
       countInput: 0,
       lines: [],
+      file: '',
       settings: settings
     })
     
@@ -76,6 +77,12 @@ export default class Canvas {
       this.nodes_map.set(node_id, node_group) // add node map
 
     return node_group
+  }
+
+  nodeSetColor(node, color) {
+    if (_.isNil(node) || _.isNil(color)) return
+    node._objects[0].set({fill: color})
+    this.canvas.renderAll()
   }
 
   addObject(...object) {
