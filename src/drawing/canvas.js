@@ -132,14 +132,7 @@ export default class Canvas {
   }
 
   renderAll() {
-    let _ = this.canvas.getObjects()
-    _.sort((obj1, obj2) => {
-      if (obj1.level === obj2.level)
-      return obj1.width * obj1.height < obj2.width * obj2.height
-      return obj1.level > obj2.level
-    })
-    
-    this.canvas.renderAll()
+    this.canvas.renderAll(true)
   }
 
   onEventListener(event = {}, handle) {
@@ -164,6 +157,11 @@ export default class Canvas {
 
   getCanvas() {
     return this.canvas
+  }
+  
+  sortCanvasObjects() {
+    let _ = this.canvas.getObjects()
+    _.sort((obj1, obj2) => obj1.level > obj2.level)
   }
 
   lockMovement() {
