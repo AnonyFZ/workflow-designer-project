@@ -42,7 +42,7 @@ export default class Canvas {
     this.disableContextMenu()
   }
 
-  createNode(name = 'Undefined', fill = '#fff', left = 0, top = 0, limitInput = 1, settings = {}) {
+  createNode(name = 'Undefined', fill = '#fff', left = 0, top = 0, limitInput = 1, settings = {}, fixed = false) {
     const node_id = this.generateId()
     const node = [
       new fabric.Circle({
@@ -71,8 +71,10 @@ export default class Canvas {
       lines: [],
       settings: settings
     })
+    
+    if (!fixed)
+      this.nodes_map.set(node_id, node_group) // add node map
 
-    this.nodes_map.set(node_id, node_group) // add node map
     return node_group
   }
 
@@ -193,5 +195,11 @@ export default class Canvas {
 
   enableMoveObject() {
     this.move_object.start()
+  }
+
+  toSVG() {
+    return this.canvas.toSVG({
+      suppressPreamble: true
+    })
   }
 }
