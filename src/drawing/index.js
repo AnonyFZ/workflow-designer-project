@@ -13,15 +13,15 @@ import Canvas from './canvas'
 import Setting from './setting'
 import Drawing from './drawing'
 import Graph from 'graph-data-structure'
-const canvas = new Canvas('drawing-canvas', 1500, 1500)
+const canvas = new Canvas('drawing-canvas', 500, 500)
 const setting = new Setting()
 
 // prevent right click on page
 document.addEventListener('contextmenu', event => event.preventDefault())
 canvas._e()
 
-for (let i = 0; i < 10; i++)
-  canvas.addObject(canvas.createNode('', undefined, _.random(36, 500), _.random(36, 600), 99, {}))
+for (let i = 0; i < 5; i++)
+  canvas.addObject(canvas.createNode('', undefined, _.random(36, 500), _.random(36, 350), 99, {}))
 
 canvas.renderAll()
 
@@ -65,3 +65,23 @@ $(document).keypress((e) => {
 
   canvas.renderAll()
 })
+
+const createNodeFixed = (id) => {
+  const width = 74, height = 74
+
+  const c = new fabric.StaticCanvas()
+  const node = canvas.createNode('Rotate', 'pink', width / 2, height / 2, 1, {}, true)
+  c.add(node)
+  $('#node1').html(c.toSVG({
+    suppressPreamble: true,
+    viewBox: {
+        x: 0,
+        y: 0,
+        width: width,
+        height: height
+    }
+  })).attr('draggable', 'true')
+}
+$(
+  // createNodeFixed('node1')
+)
