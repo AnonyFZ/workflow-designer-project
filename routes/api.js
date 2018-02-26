@@ -1,72 +1,74 @@
-import multer from "multer"
-import express, {
-  Router
-} from "express"
-import path from "path";
-const router = Router();
+import multer from 'multer'
+import express, { Router } from 'express'
+import path from 'path'
+const router = Router()
 const storage = multer.diskStorage({
-  destination: "./temp/",
+  destination: './temp/',
   filename: (req, file, cb) => {
     cb(
       null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-    );
+      file.fieldname + '-' + Date.now() + path.extname(file.originalname)
+    )
   }
-});
+})
 const upload = multer({
   storage: storage,
   limits: {
     fileSize: 25 * 1024 * 1024
   },
   fileFilter: (req, file, cb) => {
-    checkFileType(file, cb);
+    checkFileType(file, cb)
   }
-}).single("uploadImage");
+}).single('uploadImage')
 
 const checkFileType = (file, cb) => {
-  const filetypes = /jpeg|jpg|png|gif/;
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = filetypes.test(file.mimetype);
+  const filetypes = /jpeg|jpg|png|gif/
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
+  const mimetype = filetypes.test(file.mimetype)
 
-  if (mimetype && extname) return cb(null, true);
-  else cb("Image (.jpeg|.jpg|.png|.gif) Only!");
-};
+  if (mimetype && extname) return cb(null, true)
+  else cb('Image (.jpeg|.jpg|.png|.gif) Only!')
+}
 
 const upload_callback = (req, res) => {
   upload(req, res, err => {
     if (err) {
       res.json({
         msg: err
-      });
+      })
     } else {
       if (req.file === undefined) {
         res.json({
-          msg: "No File Selected!"
-        });
+          msg: 'No File Selected!'
+        })
       } else {
         res.json({
           status: 'ok',
-          msg: "File Uploaded!",
+          msg: 'File Uploaded!',
           file: `temp/${req.file.filename}`
-        });
+        })
       }
     }
-  });
-};
+  })
+}
+
+const sleep = (msec) => {
+  let waitTill = new Date(new Date().getTime() + msec);
+  while(waitTill > new Date()) {}
+}
 
 router
-  .use("/temp", express.static(path.join(__dirname, "../temp")))
-  .post("/upload/:id", upload_callback)
-  .get("/upload", (req, res) => {
-    res.render("upload");
+  .use('/temp', express.static(path.join(__dirname, '../temp')))
+  .post('/upload/:id', upload_callback)
+  .get('/upload', (req, res) => {
+    res.render('upload')
   })
-
-
-
-// const sleep = (msec) => {
-//   let waitTill = new Date(new Date().getTime() + msec);
-//   while(waitTill > new Date()) {}
-// }
+  .post('/process', (req, res) => {
+    sleep(1000)
+    res.json({
+      status: 'ok'
+    })
+  })
 
 // const socket_map = new Map()
 // const processing_map = new Map()
@@ -122,4 +124,4 @@ router
 //   res.json(`${node.id}-ok`)
 // })
 
-export default router;
+export default router

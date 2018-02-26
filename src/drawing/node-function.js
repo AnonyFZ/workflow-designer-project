@@ -1,5 +1,3 @@
-import Node from "./node-canvas";
-
 export default class {
   constructor() {}
 

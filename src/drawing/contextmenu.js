@@ -236,14 +236,14 @@ export default class NodeContextmenu {
       const button = $('<button>', {
         class: 'btn',
         type: 'submit'
-      }).text('Upload Image').appendTo(form)
+      }).text('Upload Image').appendTo(field)
 
       $(`#form-${val.type}-${objectId}`).on('submit', e => {
         e.preventDefault()
 
         if (!confirm('Are you sure?')) return
         
-        const file_form = $(`#form-${val.type}-${objectId}`)[0]
+        const file_form = $(e.currentTarget)[0]
         const data = new FormData(file_form)
 
         $.ajax({

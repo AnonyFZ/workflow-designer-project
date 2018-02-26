@@ -2,12 +2,14 @@ extends includes/template.pug
 
 block content
   include ./canvas-modal.pug
-  nav.nav
-    a#start-button.nav-link.active(href="#") Start
-    a#view-button.nav-link(href="#") View
+  ul.nav.nav-pills.nav-fill
+    li.nav-item
+      a#control-button.nav-link.btn-primary(href="#") Start
+    li.nav-item
+      a#view-button.nav-link(href="#") View
   .container-fluid.h-100
     .row.justify-content-center.no-gutters.h-100
-      #nodes-wrapping.nodes-wrapping.col-2.d-flex.flex-column
-        canvas#nodes-canvas.nodes-canvas.p-2
+      #nodes-wrapping.nodes-wrapping.col-2
+        canvas#nodes-canvas.nodes-canvas
       #drawing-wrapping.drawing-wrapping.col
         canvas#drawing-canvas.drawing-canvas
