@@ -63,7 +63,7 @@ const sleep = msec => {
 
 const getcode_callback = (req, res) => {
   const code = {
-    'End': { type: 'end' },
+    End: { type: 'end' },
     'Load Image': {
       type: 'load_image',
       style: {
@@ -92,7 +92,15 @@ const getcode_callback = (req, res) => {
         limit: 1
       }
     },
-    'Resize': {
+    'Convert HSVscale': {
+      type: 'convert_hsvscale',
+      style: {
+        fill: 'rgb(255, 153, 255)',
+        text: 'rgb(153, 0, 153)',
+        limit: 1
+      }
+    },
+    Resize: {
       type: 'resize',
       style: {
         fill: 'rgb(255, 221, 204)',
@@ -101,6 +109,15 @@ const getcode_callback = (req, res) => {
       },
       width: { type: 'input', default_value: 0 },
       height: { type: 'input', default_value: 0 }
+    },
+    Brightness: {
+      type: 'brightness',
+      style: {
+        fill: 'rgb(255, 179, 179)',
+        text: '	rgb(179, 0, 0)',
+        limit: 1
+      },
+      diff: { type: 'slider', default_value: 0, min_value: 0, max_value: 100 }
     }
   }
 
@@ -134,6 +151,16 @@ const process = data => {
         img.save(output_file)
       })
       break
+    case 'convert_hsvscale':
+      cv.readImage(nodes_map.get(input[0]), (err, img) => {
+        if (err) throw err
+        if (img.width() < 1 || img.height() < 1)
+          throw new Error('Image has no size')
+
+        img.convertHSVscale()
+        img.save(output_file)
+      })
+      break
     case 'gaussian_blur':
       let sigmaX = parseFloat(settings.sigmaX.value),
         sigmaY = parseFloat(settings.sigmaY.value)
@@ -164,6 +191,21 @@ const process = data => {
         img.resize(width, height)
         img.save(output_file)
       })
+      break
+    case 'brightness':
+      let diff = parseInt(settings.diff.value)
+      cv.readImage(nodes_map.get(input[0]), (err, img) => {
+        if (err) throw err
+        if (img.width() < 1 || img.height() < 1)
+          throw new Error('Image has no size')
+
+        if (width === 0) width = img.width() * 2
+        if (height === 0) height = img.height() * 2
+
+        img.brightness(diff)
+        img.save(output_file)
+      })
+      break
   }
 
   nodes_map.set(id, output_file)
@@ -172,7 +214,6 @@ const process = data => {
 
 const process_callback = async (req, res) => {
   const node = req.body
-  console.log(node)
   const res_data = { status: 'ok', end: 0 }
   if (node.code === 'end') {
     // reset server
