@@ -64,6 +64,8 @@ router
     res.render('upload')
   })
   .post('/process', (req, res) => {
+    console.log(req.body)
+    
     sleep(1000)
     res.json({
       status: 'ok'

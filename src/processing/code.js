@@ -10,13 +10,12 @@ export default class {
     this.code_map.set('Load Image', 2)
 
     // for debug
-    for (let i = 1; i <= 5; i++)
+    for (let i = 1; i <= 10; i++)
       this.code_map.set(`node_${i}`, 2 + i)
 
   }
 
   getCode(name) {
-    console.log(name, this.code_map.get(name))
     return this.code_map.get(name) || null // not found
   }
 }
