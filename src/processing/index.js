@@ -3,150 +3,190 @@ import Code from './code'
 
 export default class {
   constructor(canvas) {
+    this.button_id = '#control-button'
     this.canvas = canvas
-    this.isProcessing = false
-    this.resTimeout = 10000
-    this.isError = 0
-    this.xhrList = []
-    this._()
+    this.nodes = canvas.nodes_map
+    this.lines = canvas.lines_map
+    this.is_processing = false
+    this.is_error = false
+    this.url_api = 'http://127.0.0.1:8888/api/process'
+    this.queue = []
+    this.xcode = new Code()
   }
 
-  _() {
-    $(document).keypress(e => {
-      if (!e.ctrlKey) return
-      
-      this.isProcessing = true
+  $() {
+    const canvas = this.canvas
 
-      const url_api = 'http://127.0.0.1:8888/api'
-      const g = new Graph()
-      const code = new Code()
-      const nodes_map = this.canvas.nodes_map
-      const lines_map = this.canvas.lines_map
-      lines_map.forEach(elm => g.addEdge(elm.beginId, elm.endId))
-      const serial = g.serialize()
-      const sort = g.topologicalSort()
+    if (this.is_processing) {
+      this.stopProcessing()
+      return
+    }
 
-      if (_.size(sort) === 0) {
-        this.isError = 1 // no connection
+    this.is_processing = true
+    const sort = this.sortLines(this.lines)
+
+    if (sort.length === 0 || !this.is_processing) {
+      // no connection
+      alert('No Connection!')
+      this.stopProcessing()
+      return
+    }
+
+    sort.forEach(node_id => {
+      if (this.is_error > 0 || !this.is_processing) return
+
+      const node = this.nodes.get(node_id)
+      const code = this.xcode.getCode(node.name)
+      const inputs = []
+
+      if (_.isNil(code)) {
+        // not found code
+        alert('Code Error!')
+        this.stopProcessing()
         return
       }
 
-      if (e.ctrlKey && e.shiftKey && e.key === 's') {
-        this.sendProcessing(
-          url_api,
-          { is_: true, code: code.getCode('Stop') },
-          null,
-          null
-        )
-        e.preventDefault()
-        return
-      }
-
-      this.sendProcessing(
-        url_api,
-        { is_: true, code: code.getCode('Start'), count: _.size(sort) },
-        null,
-        null
-      )
-
-      _.forEach(sort, node_id => {
-        if (this.isError !== 0) return
-
-        const node = nodes_map.get(node_id)
-        const ncode = code.getCode(node.name)
-        const inputs = []
-        let file = ''
-
-        if (_.isNil(ncode)) {
-          this.isError = 2 // not found code
-          return
+      _.forEach(node.lines, line => {
+        console.log(node.id, line.beginId, line.endId)
+        if (node.id === line.endId) {
+          // get inputs
+          inputs.push(line.beginId)
         }
-
-        _.forEach(node.lines, line => {
-          if (node.id === line.endId) {
-            // get inputs
-            inputs.push(line.beginId)
-          }
-          if (node.id === line.beginId) {
-            // get files
-            node.file = `file://${node.id}`
-          }
-        })
-
-        const node_config = {
-          code: ncode,
-          name: node.name,
-          id: node.id,
-          value: node.settings.value,
-          inputs: inputs,
-          file: node.file,
-          magic_number: _.random(9999, true)
-        }
-
-        // pre-process
-        this.canvas.nodeSetColor(node, 'purple')
-
-        if (this.checkValidProcessing()) {
-          this.sendProcessing(
-            url_api,
-            node_config,
-            (xhr, status, error) => {
-              // error-process
-              this.canvas.nodeSetColor(node, 'red')
-              this.isError = 3 // ajax get error
-            },
-            data => {
-              // complete-process
-              this.canvas.nodeSetColor(node, 'green')
-              this.isError = 0 // ok
-            }
-          )
+        if (node.id === line.beginId) {
+          // get files
+          node.file = `file://${node.id}`
         }
       })
 
-      this.sendProcessing(
-        url_api,
-        { is_: true, code: code.getCode('Stop') },
-        null,
-        null
-      )
+      this.qAjax({
+        code: code,
+        name: node.name,
+        id: node.id,
+        value: node.settings.value,
+        input: inputs,
+        file: node.file
+      })
     })
+
+    if (confirm('Process?')) {
+      $(this.button_id)
+        .text('Stop')
+        .removeClass('btn-warning')
+        .addClass('btn-info')
+      this.qNext()
+    } else {
+      // cancel
+      this.stopProcessing()
+    }
   }
 
-  sendProcessing(url, data, errorHandle, successHandle) {
-    const xhr = $.ajax({
+  _() {
+    // mock data
+    const num = 10
+    const nodes = new Map()
+    const lines = new Map()
+    const arr = []
+
+    for (let i = 0; i < num; i++) {
+      const id = this.canvas.generateId()
+      const val = _.random(9999999, true, false)
+
+      arr.push(id)
+      nodes.set(id, {
+        name: `node_${i + 1}`,
+        type: `node`,
+        id: id,
+        settings: {
+          value: val,
+          default_value: val
+        },
+        lines: []
+      })
+    }
+
+    for (let i = 0; i < num; i++) {
+      const nid = arr[_.random(num - 1, true, false)]
+      const lid = this.canvas.generateId()
+      let bid, eid
+
+      do {
+        bid = _.random(num - 1, true, false)
+        eid = _.random(num - 1, true, false)
+      } while (bid === eid)
+
+      lines.set(lid, { beginId: arr[bid], endId: arr[eid] })
+      nodes.get(nid).lines.push(lines.get(lid))
+    }
+
+    this.nodes = nodes
+    this.lines = lines
+  }
+
+  sortLines(lines) {
+    const g = new Graph()
+    lines.forEach(elm => g.addEdge(elm.beginId, elm.endId))
+    return g.topologicalSort()
+  }
+
+  qAjax(data) {
+    const node = this.nodes.get(data.id)
+
+    this.queue.push({
       dataType: 'JSON',
-      url: url,
+      url: this.url_api,
       data: data,
       method: 'POST',
       cache: false,
-      timeout: (this.resTimeout += 1000),
-      beforeSend: xhr => {
-        this.xhrList.push(xhr)
+      timeout: 60000,
+      error: (xhr, status, error) => {
+        console.log(`Error: ${status}`)
+        this.canvas.nodeSetColor(node, 'red')
+        this.stopProcessing()
       },
-      error: errorHandle,
-      success: successHandle
+      success: data => {
+        if (!this.is_processing) {
+          console.log('LOO')
+          this.stopProcessing()
+          return
+        }
+        
+        console.log(data.status)
+        this.canvas.nodeSetColor(node, 'green')
+        this.is_error = 0 // ok
+      }
     })
   }
 
-  abortAllXHR() {
-    this.isError = 4
-    this.isProcessing = false
+  qNext() {
+    // basis
+    if (this.queue.length === 0 || !this.is_processing || this.is_error > 0)
+      return
 
-    _.forEach(this.xhrList, val => {
-      val.abort()
-    })
+    const qshift = this.queue.shift()
+    const node = this.nodes.get(qshift.data.id)
+    this.canvas.nodeSetColor(node, 'purple')
+
+    // recursive
+    $.ajax(qshift).done(this.qNext.bind(this))
+  }
+
+  stopProcessing() {
+    this.is_processing = false
+    this.is_error = 0
+    this.queue = []
+
+    $(this.button_id)
+      .text('Start')
+      .removeClass('btn-warning')
+      .removeClass('btn-info')
+      .addClass('btn-primary')
+
+    this.resetNodesFill()
   }
 
   resetNodesFill() {
-    this.canvas.nodes_map.forEach(node => {
-      this.canvas.nodeSetColor(node, 'lightgray')
+    this.nodes.forEach(node => {
+      this.canvas.nodeSetColor(node, '#fff')
     })
-
-    this.abortAllXHR()
-  }
-
-  checkValidProcessing() {
-    return this.isProcessing && this.isError === 0
   }
 }
