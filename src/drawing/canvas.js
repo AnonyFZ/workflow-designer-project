@@ -35,6 +35,7 @@ export default class Canvas {
     this.nodes_map = new Map()
     this.lines_map = new Map()
 
+    this.settings = null
     this.context_menu = new Contextmenu(this)
     this.move_object = new MoveObject(this)
   }
@@ -64,41 +65,38 @@ export default class Canvas {
   }
 
   createNode(
-    name,
-    fill,
-    text,
-    stroke,
+    type,
     left,
     top,
-    limitinput,
-    settings,
     fixed = false
   ) {
+    const settings = _.cloneDeep(this.settings.getSetting(type))
     const node_id = this.generateId()
-    const node = [
-      new fabric.Rect({
-        type: 'rect',
-        width: 100,
-        height: 45,
-        fill: fill,
-        stroke: stroke,
-        strokeWidth: 2
-      }),
-      new fabric.Text(name, {
-        type: 'text',
-        fontFamily: 'sans-serif',
-        fontSize: 15,
-        fill: text
-      })
-    ]
-    const node_group = new fabric.Group(node, {
+    const node_text = new fabric.Text(settings.name, {
+      type: 'text',
+      fontFamily: 'sans-serif',
+      fontSize: 15,
+      fill: settings.style.text
+    })
+    const node_rect = new fabric.Rect({
+      type: 'rect',
+      width: (node_text.width < 120) ? 120 : node_text.width + 20,
+      height: 45,
+      rx: 5,
+      ry: 5,
+      fill: settings.style.fill,
+      stroke: settings.style.text,
+      strokeWidth: 2
+    })
+
+    const node_group = new fabric.Group([node_rect, node_text], {
       level: 1,
       type: 'node',
       id: node_id,
-      name: name,
+      name: settings.name,
       left: left,
       top: top,
-      limitInput: limitinput,
+      limitInput: settings.style.limit,
       countInput: 0,
       lines: [],
       file: '',
@@ -180,8 +178,12 @@ export default class Canvas {
     return arrow
   }
 
+  setSettings(settings) {
+    this.settings = settings
+  }
+
   renderAll() {
-    this.canvas.renderAll(true)
+    this.canvas.renderAll()
   }
 
   onEventListener(event = {}, handle) {

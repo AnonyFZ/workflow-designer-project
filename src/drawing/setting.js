@@ -4,7 +4,7 @@ export default class Setting {
     this.setting_data = null
   }
 
-  loadSetting() {
+  $() {
     return $.ajax({
       url: this.url_api,
       method: 'POST',
@@ -22,12 +22,25 @@ export default class Setting {
 
   getSetting(type) {
     let data = this.setting_data
-    if (data.hasOwnProperty(type)) {
-      data = data[type]
-      _.forEach(data, (elm, key) => {
-        if (key !== 'type') elm.value = elm.default_value
+    let k = null
+    let res = null
+    _.forEach(data, (elm, key) => {
+      data[key].name = key
+      _.forEach(data[key], elm2 => {
+        if (elm2.hasOwnProperty('default_value'))
+          elm2.value = elm2.default_value
       })
-    }
-    return data
+
+      if (elm.type === type) {
+        k = key
+        return
+      }
+    })
+
+    return data[k]
+  }
+
+  get() {
+    return this.setting_data
   }
 }

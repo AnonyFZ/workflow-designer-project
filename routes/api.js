@@ -63,22 +63,44 @@ const sleep = msec => {
 
 const getcode_callback = (req, res) => {
   const code = {
-    End: { type: 'end' },
+    'End': { type: 'end' },
     'Load Image': {
       type: 'load_image',
+      style: {
+        fill: 'rgb(255, 255, 204)',
+        text: 'rgb(77, 77, 0)',
+        stroke: 'rgb(77, 77, 0)',
+        limit: 0
+      },
       upload_image: { type: 'upload', default_value: '' }
     },
-    // Rotate: {
-    //   type: 'rotate',
-    //   angle: { type: 'slider', default_value: 0, min_value: 0, max_value: 360 }
-    // },
     'Gaussian Blur': {
       type: 'gaussian_blur',
+      style: {
+        fill: 'rgb(204, 204, 255)',
+        text: 'rgb(0, 0, 77)',
+        limit: 1
+      },
       sigmaX: { type: 'input', default_value: 17 },
       sigmaY: { type: 'input', default_value: 0 }
     },
     'Convert Grayscale': {
-      type: 'convert_grayscale'
+      type: 'convert_grayscale',
+      style: {
+        fill: 'rgb(224, 235, 235)',
+        text: 'rgb(41, 61, 61)',
+        limit: 1
+      }
+    },
+    'Resize': {
+      type: 'resize',
+      style: {
+        fill: 'rgb(255, 221, 204)',
+        text: 'rgb(153, 0, 0)',
+        limit: 1
+      },
+      width: { type: 'input', default_value: 0 },
+      height: { type: 'input', default_value: 0 }
     }
   }
 
@@ -128,6 +150,20 @@ const process = data => {
         img.save(output_file)
       })
       break
+    case 'resize':
+      let width = parseInt(settings.width.value),
+        height = parseInt(settings.width.value)
+      cv.readImage(nodes_map.get(input[0]), (err, img) => {
+        if (err) throw err
+        if (img.width() < 1 || img.height() < 1)
+          throw new Error('Image has no size')
+
+        if (width === 0) width = img.width() * 2
+        if (height === 0) height = img.height() * 2
+
+        img.resize(width, height)
+        img.save(output_file)
+      })
   }
 
   nodes_map.set(id, output_file)
@@ -136,25 +172,18 @@ const process = data => {
 
 const process_callback = async (req, res) => {
   const node = req.body
+  console.log(node)
   const res_data = { status: 'ok', end: 0 }
   if (node.code === 'end') {
     // reset server
     nodes_map.clear()
     res_data.end = 1
   } else {
-    // process
-    if (!!node.input) {
-      // map node input with server input path
-      // const temp = {}
-      // node.input.forEach((elm, index) => {
-      //   temp[elm] = nodes_map.get(elm)
-      // })
-      // node.input = temp
-    }
     const r = await process(node)
     console.log(r)
   }
 
+  // sleep(1000)
   res.json(res_data)
 }
 

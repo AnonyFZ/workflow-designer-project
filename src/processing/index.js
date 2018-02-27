@@ -153,7 +153,7 @@ export default class {
 
     const qshift = this.queue.shift()
     const node = this.nodes.get(qshift.data.id)
-    this.canvas.nodeSetColor(node, 'purple')
+    this.canvas.nodeSetColor(node, 'rgb(198, 198, 236)')
 
     // recursive
     $.ajax(qshift).done(this.qNext.bind(this))
@@ -189,7 +189,7 @@ export default class {
 
   resetNodesFill() {
     this.nodes.forEach(node => {
-      this.canvas.nodeSetColor(node, '#fff')
+      this.canvas.nodeSetColor(node, node.settings.style.fill)
     })
   }
 }

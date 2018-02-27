@@ -10,6 +10,11 @@ block content
   .container-fluid.h-100
     .row.justify-content-center.no-gutters.h-100
       #nodes-wrapping.nodes-wrapping.col-2
-        canvas#nodes-canvas.nodes-canvas
+        .dropdown
+          button#dropdown-menu-button.btn.btn-info.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+            | Add Item to Canvas [Debugger]
+          #dropdown-menu.dropdown-menu(aria-labelledby='dropdown-menu-button')
+
+        //- canvas#nodes-canvas.nodes-canvas
       #drawing-wrapping.drawing-wrapping.col
         canvas#drawing-canvas.drawing-canvas
