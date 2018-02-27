@@ -2,5 +2,7 @@ FROM siomiz/node-opencv:2.4.x
 ENV NODE_ENV development
 WORKDIR /usr/src/app
 EXPOSE 8888
-CMD echo "waiting npm install..." && \
+CMD test ! -d ./node_modules && \
+      echo "NPM is Installing" && \
+      npm install; \
     npm run start-with-babel-env
