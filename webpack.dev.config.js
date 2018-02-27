@@ -4,6 +4,7 @@ export default {
   entry: {
     app: './src/index.dev.js'
   },
+  devtool: 'source-map',
   module: {
     rules: [
       {

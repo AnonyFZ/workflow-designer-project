@@ -57,7 +57,7 @@ export default class Drawing {
 
         let x1 = this.line.x1, y1 = this.line.y1,
             x2 = opt.target.left, y2 = opt.target.top
-        let line = this.canvas.createLine([x1, y1, x2, y2], undefined, this.begin_node, this.end_node)
+        let line = this.canvas.createLine([x1, y1, x2, y2], this.begin_node.settings.style.text, this.begin_node, this.end_node)
         this.canvas.addObject(line)
         this.cleanDrawing()
       }
