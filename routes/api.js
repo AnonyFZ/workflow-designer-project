@@ -1,9 +1,12 @@
 import multer from 'multer'
 import express, { Router } from 'express'
 import path from 'path'
+import cv from '../node_modules/opencv/build/opencv/v6.0.0/Release/node-v59-linux-x64/opencv.node'
+
 const router = Router()
+const image_path = './temp/'
 const storage = multer.diskStorage({
-  destination: './temp/',
+  destination: image_path,
   filename: (req, file, cb) => {
     cb(
       null,
@@ -45,85 +48,120 @@ const upload_callback = (req, res) => {
         res.json({
           status: 'ok',
           msg: 'File Uploaded!',
-          file: `temp/${req.file.filename}`
+          file: path.join(image_path, req.file.filename),
+          mimetype: req.file.mimetype
         })
       }
     }
   })
 }
 
-const sleep = (msec) => {
-  let waitTill = new Date(new Date().getTime() + msec);
-  while(waitTill > new Date()) {}
+const sleep = msec => {
+  let waitTill = new Date(new Date().getTime() + msec)
+  while (waitTill > new Date()) {}
+}
+
+const getcode_callback = (req, res) => {
+  const code = {
+    End: { type: 'end' },
+    'Load Image': {
+      type: 'load_image',
+      upload_image: { type: 'upload', default_value: '' }
+    },
+    // Rotate: {
+    //   type: 'rotate',
+    //   angle: { type: 'slider', default_value: 0, min_value: 0, max_value: 360 }
+    // },
+    'Gaussian Blur': {
+      type: 'gaussian_blur',
+      sigmaX: { type: 'input', default_value: 17 },
+      sigmaY: { type: 'input', default_value: 0 }
+    },
+    'Convert Grayscale': {
+      type: 'convert_grayscale'
+    }
+  }
+
+  res.json(code)
+}
+
+const nodes_map = new Map()
+const process = data => {
+  const id = data.id
+  const settings = data.settings
+  const code = settings.type
+  const input = data.input
+  let output_file = path.join(image_path, 'process', `${id}.png`)
+
+  switch (code) {
+    case 'load_image':
+      cv.readImage(settings.upload_image.value, (err, img) => {
+        if (err) throw err
+        if (img.width() < 1 || img.height() < 1)
+          throw new Error('Image has no size')
+        img.save(output_file)
+      })
+      break
+    case 'convert_grayscale':
+      cv.readImage(nodes_map.get(input[0]), (err, img) => {
+        if (err) throw err
+        if (img.width() < 1 || img.height() < 1)
+          throw new Error('Image has no size')
+
+        img.convertGrayscale()
+        img.save(output_file)
+      })
+      break
+    case 'gaussian_blur':
+      let sigmaX = parseFloat(settings.sigmaX.value),
+        sigmaY = parseFloat(settings.sigmaY.value)
+      cv.readImage(nodes_map.get(input[0]), (err, img) => {
+        if (err) throw err
+        if (img.width() < 1 || img.height() < 1)
+          throw new Error('Image has no size')
+
+        if (sigmaY === 0) sigmaY = sigmaX
+        if (sigmaX % 2 === 0) sigmaX++
+        if (sigmaY % 2 === 0) sigmaY++
+
+        img.gaussianBlur([sigmaX, sigmaY])
+        img.save(output_file)
+      })
+      break
+  }
+
+  nodes_map.set(id, output_file)
+  return 'ok'
+}
+
+const process_callback = async (req, res) => {
+  const node = req.body
+  const res_data = { status: 'ok', end: 0 }
+  if (node.code === 'end') {
+    // reset server
+    nodes_map.clear()
+    res_data.end = 1
+  } else {
+    // process
+    if (!!node.input) {
+      // map node input with server input path
+      // const temp = {}
+      // node.input.forEach((elm, index) => {
+      //   temp[elm] = nodes_map.get(elm)
+      // })
+      // node.input = temp
+    }
+    const r = await process(node)
+    console.log(r)
+  }
+
+  res.json(res_data)
 }
 
 router
   .use('/temp', express.static(path.join(__dirname, '../temp')))
   .post('/upload/:id', upload_callback)
-  .get('/upload', (req, res) => {
-    res.render('upload')
-  })
-  .post('/process', (req, res) => {
-    console.log(req.body)
-    
-    sleep(1000)
-    res.json({
-      status: 'ok'
-    })
-  })
-
-// const socket_map = new Map()
-// const processing_map = new Map()
-// let node_count = 0, is_stop = false
-
-// router
-// .post('/', (req, res) => {
-//   const node = req.body
-
-//   if (!!!node) {
-//     res.send(null)
-//     return
-//   }
-
-//   node.code = parseInt(node.code)
-
-//   if (node.hasOwnProperty('is_')) {
-//     let status = null
-
-//     switch (node.code) {
-//       case -1: // Start
-//         status = 'start'
-//         node_count = parseInt(node.count)
-//         is_stop = false
-//         break
-//       case 1: // Stop
-//         status = 'stop'
-//         processing_map.clear()
-//         is_stop = true
-//         res.status(500).send({ error: 'Stop' })
-//         break
-//       default:
-//         status = 'unknow_code'
-//         break
-//     }
-
-//     return
-//   }
-
-//   if (processing_map.has(node.id)) {
-//     res.send(null)
-//     return
-//   }
-
-//   if (node.hasOwnProperty('inputs')) {
-//     // get inputs
-
-//   } else {
-//     // first node, get files
-
-//   }
-
-//   res.json(`${node.id}-ok`)
-// })
+  .post('/getcode', getcode_callback)
+  .post('/process', process_callback)
 
 export default router

@@ -17,7 +17,6 @@ import Processing from '../processing'
 
 const drawing_canvas = new Canvas('drawing-canvas', 0, 0)
 const nodes_canvas = new Canvas('nodes-canvas', 0, 0)
-const setting = new Setting()
 const drawing = new Drawing(drawing_canvas)
 const context_menu = new ContextMenu(drawing_canvas)
 
@@ -38,27 +37,53 @@ window.addEventListener('resize', e => {
   nodes_canvas.resizeCanvas('#nodes-wrapping')
 })
 
-for (let i = 0; i < 5; i++) {
+const setting = new Setting()
+setting.loadSetting().done(() => {
   drawing_canvas.addObject(
     drawing_canvas.createNode(
-      `node_${i + 1}`,
+      `Load Image`,
       'rgb(255, 255, 255)',
       'rgb(0, 0, 0)',
       'rgb(0, 0, 0)',
       _.random(36, 500, false),
       _.random(36, 500, false),
-      99,
-      {
-        undef: setting.addSetting('input', {})
-      }
+      0,
+      setting.getSetting('Load Image')
     )
   )
-}
+  drawing_canvas.addObject(
+    drawing_canvas.createNode(
+      `Convert Grayscale`,
+      'rgb(255, 255, 255)',
+      'rgb(0, 0, 0)',
+      'rgb(0, 0, 0)',
+      _.random(36, 500, false),
+      _.random(36, 500, false),
+      1,
+      setting.getSetting('Convert Grayscale')
+    )
+  )
+  drawing_canvas.addObject(
+    drawing_canvas.createNode(
+      `Gaussian Blur`,
+      'rgb(255, 255, 255)',
+      'rgb(0, 0, 0)',
+      'rgb(0, 0, 0)',
+      _.random(36, 500, false),
+      _.random(36, 500, false),
+      1,
+      setting.getSetting('Gaussian Blur')
+    )
+  )
+})
 
 const processing = new Processing(drawing_canvas)
-
 $(
-  $('#control-button').click(e => {
+  $(window).keypress(e => {
     processing.$()
   })
+
+  // $('#control-button').click(e => {
+  //   processing.$()
+  // })
 )

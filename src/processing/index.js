@@ -1,5 +1,4 @@
 import Graph from 'graph-data-structure'
-import Code from './code'
 
 export default class {
   constructor(canvas) {
@@ -11,7 +10,6 @@ export default class {
     this.is_error = false
     this.url_api = 'http://127.0.0.1:8888/api/process'
     this.queue = []
-    this.xcode = new Code()
   }
 
   $() {
@@ -33,46 +31,31 @@ export default class {
     }
 
     sort.forEach(node_id => {
-      if (this.is_error > 0 || !this.is_processing) return
+      if (this.is_error || !this.is_processing) return
 
       const node = this.nodes.get(node_id)
-      const code = this.xcode.getCode(node.name)
       const inputs = []
 
-      if (_.isNil(code)) {
-        // not found code
-        alert('Code Error!')
-        this.stopProcessing()
-        return
-      }
-
       _.forEach(node.lines, line => {
-        console.log(node.id, line.beginId, line.endId)
         if (node.id === line.endId) {
           // get inputs
           inputs.push(line.beginId)
         }
-        if (node.id === line.beginId) {
-          // get files
-          node.file = `file://${node.id}`
-        }
       })
 
       this.qAjax({
-        code: code,
         name: node.name,
         id: node.id,
-        value: node.settings.value,
-        input: inputs,
-        file: node.file
+        settings: node.settings,
+        input: inputs
       })
     })
 
     if (confirm('Process?')) {
       $(this.button_id)
         .text('Stop')
-        .removeClass('btn-warning')
-        .addClass('btn-info')
+        .removeClass('btn-primary')
+        .addClass('btn-warning')
       this.qNext()
     } else {
       // cancel
@@ -130,37 +113,43 @@ export default class {
 
   qAjax(data) {
     const node = this.nodes.get(data.id)
+    const error_callback = (xhr, status, error) => {
+      console.log(`Error: ${status}`)
+      this.canvas.nodeSetColor(node, 'red')
+      this.stopProcessing()
+    }
+    const success_callback = data => {
+      if (!this.is_processing) {
+        this.stopProcessing()
+        return
+      }
 
-    this.queue.push({
+      this.canvas.nodeSetColor(node, 'green')
+      this.is_error = false // ok
+    }
+
+    this.queue.push(this.qCreateAjax(data, error_callback, success_callback))
+  }
+
+  qCreateAjax(data, error_callback, success_callback) {
+    return {
       dataType: 'JSON',
       url: this.url_api,
       data: data,
       method: 'POST',
       cache: false,
       timeout: 60000,
-      error: (xhr, status, error) => {
-        console.log(`Error: ${status}`)
-        this.canvas.nodeSetColor(node, 'red')
-        this.stopProcessing()
-      },
-      success: data => {
-        if (!this.is_processing) {
-          console.log('LOO')
-          this.stopProcessing()
-          return
-        }
-        
-        console.log(data.status)
-        this.canvas.nodeSetColor(node, 'green')
-        this.is_error = 0 // ok
-      }
-    })
+      error: error_callback,
+      success: success_callback
+    }
   }
 
   qNext() {
     // basis
-    if (this.queue.length === 0 || !this.is_processing || this.is_error > 0)
+    if (this.queue.length === 0 || !this.is_processing || this.is_error) {
+      this.stopProcessing(true)
       return
+    }
 
     const qshift = this.queue.shift()
     const node = this.nodes.get(qshift.data.id)
@@ -170,15 +159,29 @@ export default class {
     $.ajax(qshift).done(this.qNext.bind(this))
   }
 
-  stopProcessing() {
+  stopProcessing(req) {
     this.is_processing = false
-    this.is_error = 0
+    this.is_error = false
     this.queue = []
+
+    if (req) {
+      // tell server for stop
+      $.ajax(
+        this.qCreateAjax(
+          {
+            code: 'end'
+          },
+          null,
+          data => {
+            console.log(data)
+          }
+        )
+      )
+    }
 
     $(this.button_id)
       .text('Start')
       .removeClass('btn-warning')
-      .removeClass('btn-info')
       .addClass('btn-primary')
 
     this.resetNodesFill()

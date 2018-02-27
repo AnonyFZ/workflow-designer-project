@@ -4,5 +4,5 @@ WORKDIR /usr/src/app
 EXPOSE 8888
 CMD test ! -d ./node_modules && \
       echo "NPM is Installing" && \
-      npm install; \
+      npm install --build-from-source; \
     npm run start-with-babel-env

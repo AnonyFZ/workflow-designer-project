@@ -7,6 +7,7 @@ export default class NodeContextmenu {
     this.modal_title = $('#modal-title')
     this.modal_body = $('#modal-body')
     this.res_file_path = null
+    this.res_file_mimetype = null
     this.target = null
     this.is_over = false
   }
@@ -144,16 +145,24 @@ export default class NodeContextmenu {
 
     // event when mouse click save change
     $('#modal-save-settings').click(() => {
-      _.forEach(this.target.settings, (val, key) => {
+      const settings = this.target.settings
+
+      _.forEach(settings, (val, key) => {
+        if (key === 'type') return
+
         const object = $(`#${val.type}-${key}-${this.target.id}`)
+        let value = null
+
         if (val.type === 'slider')
-          val.value = object.slider('value')
-        else if (val.type === 'file') {
+        value = object.slider('value')
+        else if (val.type === 'upload') {
           if (_.isNil(this.res_file_path)) return
-          val.file = this.res_file_path
-          this.res_file_path = null
-        } else
-          val.value = object.val()
+          value = this.res_file_path
+          settings[key].mimetype = this.res_file_mimetype
+        } else if (val.type === 'input')
+          value = parseInt(object.val())
+
+        settings[key].value = value
       })
 
       $(this.modal_settings).modal('hide')
@@ -164,7 +173,9 @@ export default class NodeContextmenu {
 
   createSettingElement(val, key) {
     const objectId = `${key}-${this.target.id}`
-    
+
+    if (key === 'type') return
+
     // create common element
     const form_group = $('<div>', {
       class: 'form-group'
@@ -211,7 +222,7 @@ export default class NodeContextmenu {
             div_ui_slider_handle.text(ui.value)
           }
       })
-    } else if (val.type === 'file') {
+    } else if (val.type === 'upload') {
       const span_status = $('<span>', {
         id: `form-msg-${val.type}-${objectId}`
       }).appendTo(form_group)
@@ -255,14 +266,15 @@ export default class NodeContextmenu {
           contentType: false,
           cache: false,
           timeout: 600000,
-          success: function(data) {
+          success: (data) => {
             $(`#form-msg-${val.type}-${objectId}`).text(`  ${data.msg}`)
 
             if (data.hasOwnProperty('status')) {
               this.res_file_path = data.file
+              this.res_file_mimetype = data.mimetype
             }
           },
-          error: function(e) {
+          error: (e) => {
             console.log('ERROR: ', e)
           }
         })

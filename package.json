@@ -22,13 +22,14 @@
     "file-loader": "1.1.8"
   },
   "dependencies": {
-    "popper.js": "1.12.9",
     "body-parser": "1.18.2",
     "bootstrap": "4.0.0",
     "cors": "2.8.4",
     "express": "4.16.2",
     "express-session": "1.15.6",
     "fabric": "2.0.2",
+    "font-awesome": "4.7.0",
+    "graph-data-structure": "1.0.0",
     "jquery": "3.3.1",
     "jquery-contextmenu": "2.6.3",
     "jquery-ui-bundle": "1.12.1-migrate",
@@ -36,10 +37,9 @@
     "method-override": "2.3.10",
     "multer": "1.3.0",
     "opencv": "6.0.0",
+    "popper.js": "1.12.9",
     "pug": "2.0.0-rc.4",
     "serve-favicon": "2.4.5",
-    "graph-data-structure": "1.0.0",
-    "font-awesome": "4.7.0",
     "string-hash": "1.1.3"
   },
   "repository": {
