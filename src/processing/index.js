@@ -114,7 +114,7 @@ export default class {
   qAjax(data) {
     const node = this.nodes.get(data.id)
     const error_callback = (xhr, status, error) => {
-      console.log(`Error: ${status}`)
+      console.log(`Error: ${status}, ${error}`)
       this.canvas.nodeSetColor(node, 'red')
       this.stopProcessing()
     }

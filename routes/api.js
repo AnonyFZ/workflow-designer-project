@@ -117,7 +117,8 @@ const getcode_callback = (req, res) => {
         text: '	rgb(179, 0, 0)',
         limit: 1
       },
-      diff: { type: 'slider', default_value: 0, min_value: 0, max_value: 100 }
+      alpha: { type: 'slider', default_value: 0, min_value: 0, max_value: 3.0 },
+      beta: { type: 'slider', default_value: 0, min_value: 0, max_value: 100 }
     }
   }
 
@@ -129,12 +130,12 @@ const process = data => {
   const id = data.id
   const settings = data.settings
   const code = settings.type
-  const input = data.input
+  const input = data.input || settings.upload_image.value
   let output_file = path.join(image_path, 'process', `${id}.png`)
 
   switch (code) {
     case 'load_image':
-      cv.readImage(settings.upload_image.value, (err, img) => {
+      cv.readImage(input, (err, img) => {
         if (err) throw err
         if (img.width() < 1 || img.height() < 1)
           throw new Error('Image has no size')
@@ -179,7 +180,7 @@ const process = data => {
       break
     case 'resize':
       let width = parseInt(settings.width.value),
-        height = parseInt(settings.width.value)
+        height = parseInt(settings.height.value)
       cv.readImage(nodes_map.get(input[0]), (err, img) => {
         if (err) throw err
         if (img.width() < 1 || img.height() < 1)
@@ -193,16 +194,14 @@ const process = data => {
       })
       break
     case 'brightness':
-      let diff = parseInt(settings.diff.value)
+      let alpha = parseFloat(settings.alpha.value),
+        beta = parseInt(settings.beta.value)
       cv.readImage(nodes_map.get(input[0]), (err, img) => {
         if (err) throw err
         if (img.width() < 1 || img.height() < 1)
           throw new Error('Image has no size')
 
-        if (width === 0) width = img.width() * 2
-        if (height === 0) height = img.height() * 2
-
-        img.brightness(diff)
+        img.brightness(alpha, beta)
         img.save(output_file)
       })
       break
@@ -212,7 +211,7 @@ const process = data => {
   return 'ok'
 }
 
-const process_callback = async (req, res) => {
+const process_callback = (req, res) => {
   const node = req.body
   const res_data = { status: 'ok', end: 0 }
   if (node.code === 'end') {
@@ -220,11 +219,11 @@ const process_callback = async (req, res) => {
     nodes_map.clear()
     res_data.end = 1
   } else {
-    const r = await process(node)
+    const r = process(node)
     console.log(r)
+    sleep(1500)
   }
 
-  // sleep(1000)
   res.json(res_data)
 }
 

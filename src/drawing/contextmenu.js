@@ -164,7 +164,6 @@ export default class NodeContextmenu {
 
         if (val.type === 'slider') value = object.slider('value')
         else if (val.type === 'upload') {
-          console.log(value, object)
           if (_.isNil(this.res_file_path)) return
           value = this.res_file_path
         } else if (val.type === 'input') value = parseInt(object.val())

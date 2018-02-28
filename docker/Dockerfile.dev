@@ -1,4 +1,4 @@
-FROM siomiz/node-opencv:2.4.x
+FROM siomiz/node-opencv:latest
 ENV NODE_ENV development
 WORKDIR /usr/src/app
 EXPOSE 8888
