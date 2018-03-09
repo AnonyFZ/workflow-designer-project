@@ -6,50 +6,69 @@ bug:
 **************************************************************************
 
 hot_fix:
-
+  
 **************************************************************************/
 
 import Canvas from './canvas'
 import Setting from './setting'
 import Drawing from './drawing'
-const canvas = new Canvas('drawing-canvas', 1500, 1500)
+import ContextMenu from './contextmenu'
+import Processing from '../processing'
+
 const setting = new Setting()
+const drawing_canvas = new Canvas('drawing-canvas', 0, 0)
+// const nodes_canvas = new Canvas('nodes-canvas', 0, 0)
+const drawing = new Drawing(drawing_canvas)
+const context_menu = new ContextMenu(drawing_canvas)
 
 // prevent right click on page
-document.addEventListener('contextmenu', event => event.preventDefault())
-canvas._e()
+// window.addEventListener("contextmenu", event => event.preventDefault());
+window.addEventListener('load', e => {
+  drawing_canvas.resizeCanvas('#drawing-wrapping')
+  // nodes_canvas.resizeCanvas('#nodes-wrapping')
 
-const nodeBlur = canvas.createNode('GaussianBlur', undefined, 50, 50, 1, {
-  'sigmaX': setting.addSetting('input', {
-    value: 20,
-    default_value: 20,
+  drawing_canvas.renderAll()
+  // nodes_canvas.renderAll()
+
+  drawing.start()
+  context_menu.start()
+})
+window.addEventListener('resize', e => {
+  drawing_canvas.resizeCanvas('#drawing-wrapping')
+  // nodes_canvas.resizeCanvas('#nodes-wrapping')
+})
+
+setting.$().done(() => {
+  drawing_canvas.setSettings(setting)
+
+  const dropdown_menu = $('#dropdown-menu')
+  _.forEach(setting.setting_data, (elm, key) => {
+    if (elm.type === 'end') return
+    
+    const item = $('<a>', {
+      class: 'dropdown-item',
+      href: '#',
+      select_type: elm.type
+    }).text(key).appendTo(dropdown_menu)
+  })
+  $('.dropdown-item').click((e) => {
+    const type = e.currentTarget.getAttribute('select_type')
+    drawing_canvas.addObject(
+      drawing_canvas.createNode(
+        type,
+        _.random(36, 500, false),
+        _.random(36, 500, false)
+      )
+    )
+  })
+})
+
+const processing = new Processing(drawing_canvas)
+$(
+  $(window).keypress(e => {
+    processing.$()
   }),
-  'sigmaY': setting.addSetting('input', {
-    value: 0,
-    default_value: 0,
+  $('#control-button').click(e => {
+    processing.$()
   })
-})
-
-const nodeRotate = canvas.createNode('Rotate', undefined, 170, 170, 1, {
-  'angle': setting.addSetting('slider', {
-    value: 0,
-    default_value: 0,
-    min_value: 0,
-    max_value: 360
-  })
-})
-
-const nodeZoom = canvas.createNode('Zoom', undefined, 250, 50, 1, {
-  'scale': setting.addSetting('slider', {
-    value: 0,
-    default_value: 0,
-    min_value: -50,
-    max_value: 50
-  })
-})
-
-canvas.addObject(nodeBlur, nodeRotate, nodeZoom)
-canvas.renderAll()
-
-const drawing = new Drawing(canvas)
-drawing.start()
+)

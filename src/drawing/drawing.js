@@ -22,7 +22,34 @@ export default class Drawing {
   }
 
   mouseDblclick(opt) {
+    this.drawingNode(opt)
+  }
+
+  mouseMove(opt) {
+    if (!this.is_draw) return
+
+    let pointer = this.canvas.getPointer(opt.e)
+    let x2 = pointer.x, y2 = pointer.y
+    let color = 'red'
+    
+    if (!!opt.target) {
+      if (this.validateConnection(opt.target)) {
+        x2 = opt.target.left
+        y2 = opt.target.top
+        color = 'green'
+      }
+    }
+
+    this.begin_circle.set({fill: color})
+    this.line.set({x2: x2, y2: y2, stroke: color})
+    this.end_circle.set({left: x2, top: y2, fill: color})
+    this.canvas.renderAll()
+  }
+
+  drawingNode(opt) {
     if (_.isNil(opt.target)) return
+    if (opt.target.type !== 'node') return
+
     if (this.is_draw) {
       // when finish
       if (this.validateConnection(opt.target)) {
@@ -30,7 +57,7 @@ export default class Drawing {
 
         let x1 = this.line.x1, y1 = this.line.y1,
             x2 = opt.target.left, y2 = opt.target.top
-        let line = this.canvas.createLine([x1, y1, x2, y2], undefined, this.begin_node, this.end_node)
+        let line = this.canvas.createLine([x1, y1, x2, y2], this.begin_node.settings.style.text, this.begin_node, this.end_node)
         this.canvas.addObject(line)
         this.cleanDrawing()
       }
@@ -71,27 +98,6 @@ export default class Drawing {
       this.canvas.addObject(this.begin_circle, this.line, this.end_circle)
     }
 
-    this.canvas.renderAll()
-  }
-
-  mouseMove(opt) {
-    if (!this.is_draw) return
-
-    let pointer = this.canvas.getPointer(opt.e)
-    let x2 = pointer.x, y2 = pointer.y
-    let color = 'red'
-    
-    if (!!opt.target) {
-      if (this.validateConnection(opt.target)) {
-        x2 = opt.target.left
-        y2 = opt.target.top
-        color = 'green'
-      }
-    }
-
-    this.begin_circle.set({fill: color})
-    this.line.set({x2: x2, y2: y2, stroke: color})
-    this.end_circle.set({left: x2, top: y2, fill: color})
     this.canvas.renderAll()
   }
 

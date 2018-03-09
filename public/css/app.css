@@ -1,5 +1,5 @@
 * {
-  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-family: sans-serif, Verdana, Arial, Helvetica;
 }
 
 html, body {
@@ -7,7 +7,7 @@ html, body {
 }
 
 canvas {
-  border: 1px solid #000;
+  border: 1px solid lightgray;
 }
 
 .data-title:before {
